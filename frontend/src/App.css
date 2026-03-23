@@ -1,0 +1,146 @@
+:root {
+    --primary-color: #0E456B;
+    --secondary-color: #FF9B15;
+    --success-color: #06CC14;
+    --background-color: #FAFAFA;
+}
+
+.btn-blue {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-blue:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.editModal {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-color: transparent;
+}
+
+.editModal .modal-dialog {
+    filter: drop-shadow(0px 8px 16px rgba(0, 0, 0, 0.097));
+}
+
+.editModal .modal-dialog .modal-content {
+    border: none;
+    border-radius: 20px;
+}
+
+.editModal .modal-dialog .modal-content .uploadIamge {
+    border: 1px dashed var(--gray);
+    width: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.editModal .modal-dialog .modal-content .active {
+    border-color: #027CC5 !important;
+    background-color: #01466f76 !important;
+}
+
+.editModal .modal-dialog .modal-content .uploadIamge .flou {
+    background-color: rgba(0, 0, 0, 0.494);
+    height: 100%;
+    align-content: center;
+    color: white;
+    font-size: 1.3rem;
+}
+
+
+.editModal .modal-dialog .modal-content .uploadIamge .icon {
+    font-size: 1.5rem;
+}
+
+.editModal .modal-dialog .modal-content .uploadIamge .text {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Plan Card Styles */
+.plan-card {
+    flex: 1;
+    min-width: 150px;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+}
+
+.plan-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.plan-card.selected {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.5);
+    /* Boostrap focus ring equivalent */
+}
+
+.plan-card-primary {
+    background-color: var(--primary-color);
+}
+
+.plan-card-orange {
+    background-color: var(--secondary-color);
+}
+
+.plan-card-gold {
+    background-color: #B89714;
+    /* Derived from secondary but more golden for advanced */
+}
+
+.plan-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 4px;
+}
+
+.plan-card-body {
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Insurance Toggle */
+.insurance-toggle {
+    cursor: pointer;
+    display: inline-block;
+}
+
+.toggle-track {
+    width: 40px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 20px;
+    position: relative;
+    transition: background-color 0.3s;
+}
+
+.toggle-track.active {
+    background-color: var(--primary-color);
+}
+
+.toggle-thumb {
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+}
+
+.toggle-track.active .toggle-thumb {
+    transform: translateX(20px);
+}

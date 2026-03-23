@@ -1,0 +1,124 @@
+:root {
+    --sidebar-width: 280px;
+    --sidebar-width-collapsed: 80px;
+    --primary-color: #0E456B;
+    --secondary-color: #FF9B15;
+    --success-color: #06CC14;
+    --danger-color: #FF6B6B;
+    --background-color: #FAFAFA;
+    --shadow: 0px 0px 6px #00000018;
+}
+
+.page {}
+
+.page .header-page {
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.page .header-page .title {
+    color: var(--primary-color);
+}
+
+.page .box {
+    background-color: white;
+    box-shadow: var(--shadow);
+}
+
+.text-success-c {
+    color: var(--success-color) !important;
+}
+
+.text-primary-c {
+    color: var(--primary-color) !important;
+}
+
+.text-secondary-c {
+    color: var(--secondary-color) !important;
+}
+
+.text-danger-c {
+    color: var(--danger-color) !important;
+}
+
+.border-primary-c {
+    border-color: var(--primary-color) !important;
+}
+
+.filter-select-primary {
+    background-color: var(--primary-color);
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    border: 0px !important;
+    /* Custom arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6l4 4 4-4' stroke='white' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+}
+
+.filter-select-primary:focus {
+    outline: none;
+}
+
+.select-action-trans {
+    background-color: transparent !important;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+    border: 1px solid white;
+    /* Custom arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6l4 4 4-4' stroke='white' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+}
+
+.select-action-trans option {
+    color: #0E456B;
+}
+
+.select-action-trans:focus {
+    outline: none;
+}
+
+.dataTableBox {
+    background-color: white;
+    box-shadow: var(--shadow);
+}
+
+.single-user-page .card {
+    border-radius: 12px;
+}
+
+.single-user-page .stats-container .card {
+    min-height: 100px;
+}
+
+.single-user-page .profile-img-container img {
+    border: 4px solid white;
+    box-shadow: var(--shadow);
+}
+
+.single-user-page .header-page {
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* RTL fix: keep modal close button always in the top-right corner */
+/* [dir="rtl"] .modal-header {
+    flex-direction: row-reverse;
+} */
+
+[dir="rtl"] .modal-header .btn-close {
+    margin: 0;
+}
+
+[dir="rtl"] .modal-footer {
+    flex-direction: row-reverse;
+}

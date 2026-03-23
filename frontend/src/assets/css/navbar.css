@@ -1,0 +1,29 @@
+:root {
+    --sidebar-width: 280px;
+    --sidebar-width-collapsed: 80px;
+    --primary-color: #0E456B;
+    --secondary-color: #FF9B15;
+    --success-color: #06CC14;
+    --background-color: #FAFAFA;
+}
+.customNavbar{
+    background-color: white;
+    box-shadow: 0px 0px 8px #0000001f;
+}
+.customNavbar .logo{
+    width: 100px;
+}
+
+.btn-mobile-menu{
+    background-color: transparent;
+    border: 0px;
+    color: var(--secondary-color);
+}
+.btn-mobile-menu svg{
+    width:40px;
+    height: 40px;
+}
+
+.rightMenu .slectLang{
+    background-color: var(--background-color);
+}   

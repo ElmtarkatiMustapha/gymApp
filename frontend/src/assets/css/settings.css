@@ -1,0 +1,51 @@
+.settings-card {
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    transition: box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.settings-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.settings-card .card-header {
+    background-color: transparent;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1rem 1.25rem;
+}
+
+.settings-card .card-body {
+    padding: 1.25rem;
+}
+
+.settings-card .edit-btn {
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.settings-card .edit-btn:hover {
+    transform: scale(1.1);
+}
+
+.settings-label {
+    font-weight: 600;
+    color: #555;
+    margin-right: 0.5rem;
+}
+
+.settings-value {
+    color: #333;
+}
+
+.message-template-box {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    min-height: 80px;
+}

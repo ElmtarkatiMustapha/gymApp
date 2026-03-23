@@ -1,0 +1,39 @@
+{
+    "businessInfo": {
+        "name": "gym system",
+        "city": "taza",
+        "adresse": "taza morocoo",
+        "phone": "0600000000",
+        "email": "[EMAIL_ADDRESS]",
+        "logo": ""
+    },
+    "emailSettings": {
+        "host": "",
+        "port": "",
+        "username": "",
+        "password": ""
+    },
+    "insurance": {
+        "price": "100",
+        "periode": 12
+    },
+    "alertSettings": {
+        "autoNotice": true,
+        "days_before_expiration": 7,
+        "pre_expire_times": 2,
+        "expire_times": 2,
+        "days_between_alerts": 2
+    },
+    "messageTemplate": {
+        "successPayment": null,
+        "welcome": null,
+        "preExpiration": "hi sir,\nyour subscription will expire soon",
+        "expiration": "hi sir,\nyour subscription is expired, please renew your subscription"
+    },
+    "invoiceSettings": {
+        "header": "Welcome to our gym",
+        "footer": "thanks for your trust"
+    },
+    "installed": true,
+    "picture": []
+}
