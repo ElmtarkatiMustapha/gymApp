@@ -12,9 +12,11 @@ import { useRef } from "react";
 import { Lang } from "../../assets/js/lang";
 import { ButtonBlue } from "../../components/ButtonBlue";
 import api from "../../api/api";
+import { safeFormatDate } from "../../utils/dateFormat";
 import { CustomDataTable } from "../../components/CustomDataTable";
 import { AddModal } from "./components/AddModal";
 import { DateRangeModal } from "../../components/DateRangeModal";
+import { printCustomerFile } from "../../utils/printCustomerFile";
 
 export function Customers() {
     // Example columns for DataTable
@@ -47,6 +49,11 @@ export function Customers() {
         {
             name: <Lang>Sexe</Lang>,
             selector: row => <Lang>{row.sexe}</Lang>,
+            sortable: true,
+        },
+        {
+            name: <Lang>Birthday</Lang>,
+            selector: row => safeFormatDate(row.birthday),
             sortable: true,
         },
         {
@@ -102,6 +109,9 @@ export function Customers() {
                 if (!rowActions.find(a => a.value === 'notice')) {
                     rowActions.push({ value: 'notice', name: 'Notice' });
                 }
+                if (!rowActions.find(a => a.value === 'print')) {
+                    rowActions.push({ value: 'print', name: 'Print File' });
+                }
                 return <SelectAction options={rowActions} id={row.id} onChange={handleAction} />;
             },
             sortable: false
@@ -135,6 +145,8 @@ export function Customers() {
         endDate: new Date(),
         key: 'selection',
     }])
+    const [search, setSearch] = useState("");
+    const searchTimeoutRef = useRef(null);
     const handleFilterSexe = (e) => {
         setFilterSexe(e.target.value)
     }
@@ -193,6 +205,27 @@ export function Customers() {
                     appAction({ type: "SET_ERROR", payload: error?.response?.data?.message || "Failed to send notification" });
                     setLoading(false);
                 });
+        } else if (action === "print") {
+            setLoading(true);
+            api({ method: "get", url: `/customers/details/${id}` })
+                .then((res) => {
+                    if (res.data && res.data.data) {
+                        const d = res.data.data;
+                        printCustomerFile({
+                            customerData: d.customer,
+                            activePlan: d.active_plan,
+                            subscriptionsHistory: d.subscriptions_history,
+                            insurancesHistory: d.insurances_history,
+                            settings: appState.settings,
+                            langData: appState.langData,
+                            currentLang: appState.currentLang,
+                        });
+                    }
+                })
+                .catch((error) => {
+                    appAction({ type: "SET_ERROR", payload: error?.response?.data?.message || "Failed to load customer details" });
+                })
+                .finally(() => setLoading(false));
         }
         e.target.value = "default";
     }
@@ -264,7 +297,8 @@ export function Customers() {
                     filter: filter,
                     filterSexe: filterSexe,
                     startDate: startDate,
-                    endDate: endDate
+                    endDate: endDate,
+                    search: search || undefined
                 },
             })
             if (response.data && response.data.data) {
@@ -288,15 +322,29 @@ export function Customers() {
 
     }, [filter, filterSexe, startDate, endDate])
 
+    useEffect(() => {
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        searchTimeoutRef.current = setTimeout(() => {
+            fetchCustomers();
+        }, 400);
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, [search]);
+
     return (
         <>
             <div className="container-fluid page">
                 <div className="row header-page p-0 m-2">
-                    <div className="col-6 col-sm-6 col-md-4 p-0">
+                    <div className="col-12 col-sm-6 p-0 d-flex align-items-end">
                         <div className="title h3 m-0 fw-semibold p-2 ps-0"><Lang>Customers</Lang></div>
                     </div>
-                    <div className="col-6 col-sm-6 col-md-3 p-0 text-end d-flex justify-content-end align-items-end">
-                        <div className="d-inline-block p-2 pe-0 ">
+                    <div className="col-12 col-sm-6 p-0 text-end d-flex justify-content-start justify-content-sm-end align-items-end flex-wrap">
+                        <div className="d-inline-block p-2 pe-0">
                             <select onChange={handleBulkAction} className="form-select pt-1 pb-1 filter-select-primary w-auto" defaultValue="all">
                                 <option value="all" disabled><Lang>Actions</Lang></option>
                                 <option value="add"><Lang>Add New</Lang></option>
@@ -304,8 +352,6 @@ export function Customers() {
                                 <option value="expired"><Lang>Notice Expired</Lang></option>
                             </select>
                         </div>
-                    </div>
-                    <div className="col-12 col-sm-12 col-md-5 p-0 text-end d-flex justify-content-end align-items-end">
                         <div className="d-inline-block p-2">
                             <FilterSelectPrimary options={optionFilterSexe} onChange={handleFilterSexe} defTitle="All" defaultValue="all" defaultOption="all" />
                         </div>
@@ -314,6 +360,7 @@ export function Customers() {
                         </div>
                     </div>
                 </div>
+                
                 <div className="row statistics m-0">
                     <div className="col-12 col-sm-12 col-md-3 p-2">
                         <StatisticBox label={<Lang>Total Of Customers</Lang>} value={data?.activeCustomers + data?.disactiveCustomers} color={"primary-c"} />
@@ -323,6 +370,19 @@ export function Customers() {
                     </div>
                     <div className="col-12 col-sm-12 col-md-3 p-2">
                         <StatisticBox label={<Lang>Inactive Customers</Lang>} value={data?.disactiveCustomers} color={"danger-c"} />
+                    </div>
+                </div>
+                <div className="row m-2 mt-0">
+                    <div className="col-12 col-sm-6 offset-sm-6 p-0 text-end">
+                        <div className="p-2 pe-0">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder={appState.langData["Search by Name, CIN or ID"] || "Search by Name, CIN or ID"}
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
                     </div>
                 </div>
                 <div className="row body-page p-2 m-0">

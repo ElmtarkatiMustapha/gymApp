@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('cin')->nullable();
             $table->string('phone')->nullable();
-            $table->string('email');
+            $table->string('email')->nullable();
             $table->string('sexe');
+            $table->date('birthday')->nullable();
             $table->boolean('state')->default(1);
             $table->string('adresse')->nullable();
             $table->bigInteger('user_id');

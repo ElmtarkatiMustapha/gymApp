@@ -81,11 +81,11 @@ export function EditModal({ handleClose, onCustomerEdited, editedCustomerId }) {
                     <div className="modal-body">
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Name</Lang> (*) : {loading && <Spinner />}</label>
-                            <input type="text" name="name" required defaultValue={formData.name} disabled={loading} className="form-control" placeholder="Ex: mustapha el mtarkati" />
+                            <input type="text" name="name" required defaultValue={formData.name} disabled={loading} className="form-control" placeholder={t("Tap Name")} />
                         </div>
                         <div className="mb-3">
-                            <label className="form-label h6 fw-bold"><Lang>Email</Lang> (*) : {loading && <Spinner />}</label>
-                            <input type="email" required defaultValue={formData.email} disabled={loading} name="email" className="form-control" placeholder={t("Tap email")} />
+                            <label className="form-label h6 fw-bold"><Lang>Email</Lang> : {loading && <Spinner />}</label>
+                            <input type="email" defaultValue={formData.email} disabled={loading} name="email" className="form-control" placeholder={t("Tap email")} />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Cin</Lang> : {loading && <Spinner />}</label>
@@ -94,6 +94,10 @@ export function EditModal({ handleClose, onCustomerEdited, editedCustomerId }) {
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Phone</Lang> : {loading && <Spinner />}</label>
                             <input type="text" defaultValue={formData.phone} disabled={loading} name="phone" className="form-control" placeholder={t("Tap Phone")} />
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label h6 fw-bold"><Lang>Birthday</Lang> : {loading && <Spinner />}</label>
+                            <input type="date" defaultValue={formData.birthday || ''} disabled={loading} name="birthday" className="form-control" />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Adresse</Lang> : {loading && <Spinner />}</label>

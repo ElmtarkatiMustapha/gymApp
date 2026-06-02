@@ -8,6 +8,7 @@ import { DateRangeModal } from "../../../components/DateRangeModal";
 import { CustomDataTable } from "../../../components/CustomDataTable";
 import { Spinner } from "../../../components/Spinner";
 import { format } from "date-fns";
+import { safeFormatDate } from "../../../utils/dateFormat";
 import { FaEdit } from "react-icons/fa";
 import { EditModal } from "../components/EditModal";
 import "../../../assets/css/pages.css";
@@ -47,8 +48,8 @@ export function SingleUser() {
         { name: 'Customer', selector: row => row.customer?.name || 'N/A' },
         { name: 'Duration', selector: row => (row.duration || 0) + " mois" },
         { name: 'Total (DH)', selector: row => row.price },
-        { name: 'Start at', selector: row => row.start_at ? format(new Date(row.start_at), "dd/MM/yyyy") : 'N/A' },
-        { name: 'Expire at', selector: row => row.expire_at ? format(new Date(row.expire_at), "dd/MM/yyyy") : 'N/A' }
+        { name: 'Start at', selector: row => safeFormatDate(row.start_at, 'N/A') },
+        { name: 'Expire at', selector: row => safeFormatDate(row.expire_at, 'N/A') }
     ];
 
     const insuranceColumns = [
@@ -56,8 +57,8 @@ export function SingleUser() {
         { name: 'Price (DH)', selector: row => row.price },
         { name: 'Customer', selector: row => row.customer?.name || 'N/A' },
         { name: 'Duration', selector: row => appState.settings?.insurance.periode + " Months" || "N/A" },
-        { name: 'Start at', selector: row => row.start_at ? format(new Date(row.start_at), "dd/MM/yyyy") : 'N/A' },
-        { name: 'Expire at', selector: row => row.expire_at ? format(new Date(row.expire_at), "dd/MM/yyyy") : 'N/A' }
+        { name: 'Start at', selector: row => safeFormatDate(row.start_at, 'N/A') },
+        { name: 'Expire at', selector: row => safeFormatDate(row.expire_at, 'N/A') }
     ];
 
     const fetchDetails = async () => {

@@ -12,6 +12,7 @@ import { ViewModal } from "./components/ViewModal";
 import { EditModal } from "./components/EditModal";
 import { DateRangeModal } from "../../components/DateRangeModal";
 import { format } from "date-fns";
+import { safeFormatDate } from "../../utils/dateFormat";
 
 export function Insurances() {
     const appState = useAppState();
@@ -32,17 +33,17 @@ export function Insurances() {
         },
         {
             name: <Lang>Started at</Lang>,
-            selector: row => row.start_at,
+            selector: row => safeFormatDate(row.start_at),
             sortable: true,
         },
         {
             name: <Lang>Expired at</Lang>,
-            selector: row => row.expire_at,
+            selector: row => safeFormatDate(row.expire_at),
             sortable: true,
         },
         {
             name: <Lang>Payed at</Lang>,
-            selector: row => row.created_at,
+            selector: row => safeFormatDate(row.created_at),
             sortable: true,
         },
         {

@@ -15,6 +15,7 @@ class Customer extends Model
         "cin",
         "phone",
         "sexe",
+        "birthday",
         "state",
         "user_id",
     ];

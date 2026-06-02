@@ -219,7 +219,8 @@ class CustomerController extends Controller
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', '%' . $search . '%')
-                      ->orWhere('cin', 'like', '%' . $search . '%');
+                      ->orWhere('cin', 'like', '%' . $search . '%')
+                      ->orWhere('id', $search);
                 });
             }
 
@@ -288,6 +289,7 @@ class CustomerController extends Controller
                         'phone' => $customer->phone,
                         'email' => $customer->email,
                         'sexe' => $customer->sexe,
+                        'birthday' => $customer->birthday,
                     'insurance' => $insuranceStatus,
                     'state' => $customer->state? "Active" : "Inactive" ,
                     'plan' => $planData,
@@ -317,9 +319,10 @@ class CustomerController extends Controller
             $validateFields = $request->validate([
                 "name" => "required",
                 "adresse" => "string|nullable",
-                "email" => "required|email|unique:customers,email",
+                "email" => "nullable|email|unique:customers,email",
                 "cin" => "string|nullable",
                 "phone" => "string|nullable",
+                "birthday" => "nullable|date",
                 "state" => "required",
                 "sexe" => "required",
                 "plan" => "required",
@@ -334,6 +337,7 @@ class CustomerController extends Controller
                 "email" => $validateFields['email'],
                 "cin" => $validateFields['cin'],
                 "phone" => $validateFields['phone'],
+                "birthday" => $validateFields['birthday'] ?? null,
                 "state" => $validateFields['state'],
                 "sexe" => $validateFields['sexe'],
                 "user_id" => $user->id
@@ -372,6 +376,7 @@ class CustomerController extends Controller
                 'phone' => $customer->phone,
                 'email' => $customer->email,
                 'sexe' => $customer->sexe,
+                'birthday' => $customer->birthday,
                 'insurance' => $insuranceStatus,
                 'state' => $customer->state? "Active" : "Inactive" ,
                 'plan' => [
@@ -407,9 +412,10 @@ class CustomerController extends Controller
             $validateFields = $request->validate([
                 "name" => "required",
                 "adresse" => "string|nullable",
-                "email" => "required|email|unique:customers,email," . $id,
+                "email" => "nullable|email|unique:customers,email," . $id,
                 "cin" => "string|nullable",
                 "phone" => "string|nullable",
+                "birthday" => "nullable|date",
                 "state" => "required",
                 "sexe" => "required",
             ]);
@@ -421,6 +427,7 @@ class CustomerController extends Controller
                 "email" => $validateFields['email'],
                 "cin" => $validateFields['cin'],
                 "phone" => $validateFields['phone'],
+                "birthday" => $validateFields['birthday'] ?? null,
                 "state" => $validateFields['state'],
                 "sexe" => $validateFields['sexe'],
             ]);
@@ -524,6 +531,7 @@ class CustomerController extends Controller
                         "phone" => $customer->phone,
                         "email" => $customer->email,
                         "sexe" => $customer->sexe,
+                        "birthday" => $customer->birthday,
                         "state" => $customer->state ? 'Active' : 'Inactive',
                         "insurance_status" => $insuranceStatus,
                         "insurance_expire_at" => $insuranceExpireAt,

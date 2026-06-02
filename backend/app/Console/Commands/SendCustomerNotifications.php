@@ -63,7 +63,11 @@ class SendCustomerNotifications extends Command
 
                     $now = Carbon::now();
                     $lastNotified = $subscription->last_notified_at ? Carbon::parse($subscription->last_notified_at) : null;
-
+                    Log::info('last notified: ' . $lastNotified);
+                    Log::info('Diff days alerts: ');
+                    Log::info($now->diffInDays($lastNotified));
+                    Log::info('days between alerts: ');
+                    Log::info($daysBetween);
                     // Respect days_between_alerts
                     if ($lastNotified && $now->diffInDays($lastNotified) < $daysBetween) {
                         continue;

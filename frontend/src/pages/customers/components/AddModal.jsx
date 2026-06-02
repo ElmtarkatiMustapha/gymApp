@@ -19,6 +19,7 @@ export function AddModal({ handleClose, onCustomerAdded }) {
         email: "",
         adresse: "",
         sexe: "male",
+        birthday: "",
         plan: "",
         insurance: false,
         start_at: new Date().toISOString().split('T')[0],

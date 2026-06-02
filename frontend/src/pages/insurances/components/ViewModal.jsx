@@ -1,4 +1,5 @@
 import { Lang } from "../../../assets/js/lang";
+import { safeFormatDate } from "../../../utils/dateFormat";
 
 export function ViewModal({ handleClose, insurance }) {
     if (!insurance) return null;
@@ -26,14 +27,14 @@ export function ViewModal({ handleClose, insurance }) {
                             <h6 className="fw-bold text-primary-c border-bottom pb-2"><Lang>Insurance Information</Lang></h6>
                             <div className="row">
                                 <div className="col-6 mb-2"><strong><Lang>Price</Lang>:</strong> {insurance.price} DH</div>
-                                <div className="col-6 mb-2"><strong><Lang>Payed at</Lang>:</strong> {insurance.created_at}</div>
+                                <div className="col-6 mb-2"><strong><Lang>Payed at</Lang>:</strong> {safeFormatDate(insurance.created_at, 'N/A')}</div>
                             </div>
                         </div>
                         <div className="mb-4">
                             <h6 className="fw-bold text-primary-c border-bottom pb-2"><Lang>Dates</Lang></h6>
                             <div className="row">
-                                <div className="col-6 mb-2"><strong><Lang>Start at</Lang>:</strong> {insurance.start_at}</div>
-                                <div className="col-6 mb-2"><strong><Lang>Expire at</Lang>:</strong> {insurance.expire_at}</div>
+                                <div className="col-6 mb-2"><strong><Lang>Start at</Lang>:</strong> {safeFormatDate(insurance.start_at, 'N/A')}</div>
+                                <div className="col-6 mb-2"><strong><Lang>Expire at</Lang>:</strong> {safeFormatDate(insurance.expire_at, 'N/A')}</div>
                                 <div className="col-12 mb-2"><strong><Lang>State</Lang>:</strong> <span className={`badge ${insurance.state === 'Active' ? 'bg-success' : 'bg-danger'}`}>{insurance.state}</span></div>
                             </div>
                         </div>

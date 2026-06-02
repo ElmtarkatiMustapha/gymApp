@@ -1,5 +1,5 @@
 import { Lang } from "../../../assets/js/lang";
-import { format } from "date-fns";
+import { safeFormatDate } from "../../../utils/dateFormat";
 
 export function ViewModal({ handleClose, subscription }) {
     if (!subscription) return null;
@@ -38,8 +38,8 @@ export function ViewModal({ handleClose, subscription }) {
                         <div className="mb-4">
                             <h6 className="fw-bold text-primary-c border-bottom pb-2"><Lang>Subscription Dates</Lang></h6>
                             <div className="row">
-                                <div className="col-6 mb-2"><strong><Lang>Start at</Lang>:</strong> {subscription.start_at}</div>
-                                <div className="col-6 mb-2"><strong><Lang>Expire at</Lang>:</strong> {subscription.expire_at}</div>
+                                <div className="col-6 mb-2"><strong><Lang>Start at</Lang>:</strong> {safeFormatDate(subscription.start_at, 'N/A')}</div>
+                                <div className="col-6 mb-2"><strong><Lang>Expire at</Lang>:</strong> {safeFormatDate(subscription.expire_at, 'N/A')}</div>
                                 <div className="col-12 mb-2"><strong><Lang>State</Lang>:</strong> <span className={`badge ${subscription.state === 'Active' ? 'bg-success' : 'bg-danger'}`}>{subscription.state}</span></div>
                             </div>
                         </div>

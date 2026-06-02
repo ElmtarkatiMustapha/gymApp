@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api, { getImageURL } from "../../../api/api";
+import api from "../../../api/api";
 import { useAppAction, useAppState } from "../../../context/context";
 import { Lang } from "../../../assets/js/lang";
 import { FilterDate } from "../../../components/FilterDate";
@@ -8,7 +8,8 @@ import { DateRangeModal } from "../../../components/DateRangeModal";
 import { CustomDataTable } from "../../../components/CustomDataTable";
 import { CustomLoader } from "../../../components/CustomLoader";
 import { format } from "date-fns";
-import { FaEdit, FaPlus } from "react-icons/fa";
+import { safeFormatDate } from "../../../utils/dateFormat";
+import { FaEdit, FaPlus, FaPrint } from "react-icons/fa";
 import { EditModal as CustomerEditModal } from "../components/EditModal";
 import { AddModal as SubscriptionAddModal } from "../../subscriptions/components/AddModal";
 import { EditModal as SubscriptionEditModal } from "../../subscriptions/components/EditModal";
@@ -16,10 +17,10 @@ import { AddModal as InsuranceAddModal } from "../../insurances/components/AddMo
 import { EditModal as InsuranceEditModal } from "../../insurances/components/EditModal";
 import "../../../assets/css/pages.css";
 import { ButtonBlue } from "../../../components/ButtonBlue";
+import { printCustomerFile } from "../../../utils/printCustomerFile";
 
 export function SingleCustomer() {
     const { id } = useParams();
-    // console.log("id", id);
     const navigate = useNavigate();
     const appState = useAppState();
     const appAction = useAppAction();
@@ -47,14 +48,46 @@ export function SingleCustomer() {
     const [showInsEditModal, setShowInsEditModal] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
 
+    const handlePrintCustomerFile = () => {
+        printCustomerFile({
+            customerData,
+            activePlan,
+            subscriptionsHistory,
+            insurancesHistory,
+            settings: appState.settings,
+            langData: appState.langData,
+            currentLang: appState.currentLang,
+        });
+    };
+
+    const getSubscriptionState = (row) => {
+        const now = new Date();
+        const start = new Date(row.start_at);
+        const expire = new Date(row.expire_at);
+        if (start > now) return { label: 'Upcoming', class: 'text-warning' };
+        if (expire < now) return { label: 'Expired', class: 'text-danger' };
+        if (Math.ceil((expire - now) / (1000 * 60 * 60 * 24)) <= 7) return { label: 'Pre-expire', class: 'text-warning' };
+        return { label: 'Active', class: 'text-success' };
+    };
+
     const subscriptionColumns = [
-        { name: '#', selector: (row, index) => index + 1, width: '50px' },
+        { name: 'ID', selector: row => row.id, sortable: true, width: '70px' },
         { name: 'Plan', selector: row => row.plan?.description || 'N/A' },
         { name: 'Duration', selector: row => (row.duration || 0) + " mois" },
         { name: 'Total (DH)', selector: row => row.price },
-        { name: 'Start at', selector: row => row.start_at },
-        { name: 'Expire at', selector: row => row.expire_at },
-        { name: 'Payed at', selector: row => row.created_at ? format(new Date(row.created_at), "dd/MM/yyyy") : 'N/A' },
+        { name: 'Start at', selector: row => row.start_at, cell: row => safeFormatDate(row.start_at), sortable: true },
+        { name: 'Expire at', selector: row => row.expire_at, cell: row => safeFormatDate(row.expire_at), sortable: true },
+        { name: 'Payed at', selector: row => row.created_at, cell: row => safeFormatDate(row.created_at, 'N/A'), sortable: true },
+        {
+            name: 'State',
+            selector: row => getSubscriptionState(row).label,
+            cell: row => {
+                const st = getSubscriptionState(row);
+                return <span className={st.class}><Lang>{st.label}</Lang></span>;
+            },
+            sortable: true,
+            width: '100px'
+        },
         {
             name: 'Action',
             cell: row => (
@@ -69,13 +102,31 @@ export function SingleCustomer() {
         }
     ];
 
+    const getInsuranceState = (row) => {
+        const now = new Date();
+        const expire = new Date(row.expire_at);
+        return expire > now
+            ? { label: 'Active', class: 'text-success' }
+            : { label: 'Expired', class: 'text-danger' };
+    };
+
     const insuranceColumns = [
-        { name: '#', selector: (row, index) => index + 1, width: '50px' },
+        { name: 'ID', selector: row => row.id, sortable: true, width: '70px' },
         { name: 'Price (DH)', selector: row => row.price },
         { name: 'Duration', selector: row => (row.periode || 12) + " mois" },
-        { name: 'Start at', selector: row => row.start_at },
-        { name: 'Expire at', selector: row => row.expire_at },
-        { name: 'Payed at', selector: row => row.created_at ? format(new Date(row.created_at), "dd/MM/yyyy") : 'N/A' },
+        { name: 'Start at', selector: row => row.start_at, cell: row => safeFormatDate(row.start_at), sortable: true },
+        { name: 'Expire at', selector: row => row.expire_at, cell: row => safeFormatDate(row.expire_at), sortable: true },
+        { name: 'Payed at', selector: row => row.created_at, cell: row => safeFormatDate(row.created_at, 'N/A'), sortable: true },
+        {
+            name: 'State',
+            selector: row => getInsuranceState(row).label,
+            cell: row => {
+                const st = getInsuranceState(row);
+                return <span className={st.class}><Lang>{st.label}</Lang></span>;
+            },
+            sortable: true,
+            width: '100px'
+        },
         {
             name: 'Action',
             cell: row => (
@@ -115,6 +166,8 @@ export function SingleCustomer() {
         fetchDetails();
     }, [filter, startDate, endDate, id]);
 
+
+
     const handleFilter = (e) => {
         if (e.target.value === "range") {
             setOpenCalendar(true);
@@ -141,7 +194,10 @@ export function SingleCustomer() {
                     <div className="col-6">
                         <div className="title h3 m-0 fw-semibold p-2 ps-0"><Lang>Customer</Lang>: {customerData.id}</div>
                     </div>
-                    <div className="col-6 text-end">
+                    <div className="col-6 text-end d-flex justify-content-end align-items-center gap-2">
+                        <button className="btn btn-blue rounded-pill pt-1 pb-1 fw-bold d-flex align-items-center gap-2" onClick={handlePrintCustomerFile}>
+                            <FaPrint /> <span className="d-none d-sm-inline"><Lang>Print File</Lang></span>
+                        </button>
                         <FilterDate onChange={handleFilter} filter={filter} />
                     </div>
                 </div>
@@ -165,6 +221,10 @@ export function SingleCustomer() {
                                     <span className="text-muted">{customerData.sexe}</span>
                                 </div>
                                 <div className="col-md-6 mb-3">
+                                    <span className="fw-bold text-primary-c me-2"><Lang>Birthday</Lang>:</span>
+                                    <span className="text-muted">{safeFormatDate(customerData.birthday, 'N/A')}</span>
+                                </div>
+                                <div className="col-md-6 mb-3">
                                     <span className="fw-bold text-primary-c me-2"><Lang>CIN</Lang>:</span>
                                     <span className="text-muted">{customerData.cin || 'N/A'}</span>
                                 </div>
@@ -180,7 +240,7 @@ export function SingleCustomer() {
                                 </div>
                                 <div className="col-md-6 mb-3">
                                     <span className="fw-bold text-primary-c me-2"><Lang>Issurance expire at</Lang>:</span>
-                                    <span className="text-muted">{customerData.insurance_expire_at}</span>
+                                    <span className="text-muted">{safeFormatDate(customerData.insurance_expire_at, 'N/A')}</span>
                                 </div>
                                 <div className="col-md-6 mb-3">
                                     <span className="fw-bold text-primary-c me-2"><Lang>Email</Lang>:</span>
@@ -220,11 +280,11 @@ export function SingleCustomer() {
                                 </div>
                                 <div className="mb-2">
                                     <span className="fw-bold me-2"><Lang>Start At</Lang>:</span>
-                                    <span>{activePlan?.start_at || 'N/A'}</span>
+                                    <span>{safeFormatDate(activePlan?.start_at, 'N/A')}</span>
                                 </div>
                                 <div className="mb-0">
                                     <span className="fw-bold me-2"><Lang>Expire At</Lang>:</span>
-                                    <span>{activePlan?.expire_at || 'N/A'}</span>
+                                    <span>{safeFormatDate(activePlan?.expire_at, 'N/A')}</span>
                                 </div>
                             </div>
                         </div>

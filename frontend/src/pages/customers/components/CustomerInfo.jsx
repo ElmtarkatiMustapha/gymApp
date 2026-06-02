@@ -28,8 +28,8 @@ export function CustomerInfo({ handleClose, onNext, formData, setFormData, loadi
                     <input type="text" value={formData.name || ""} onChange={handleChange} required disabled={loading} name="name" className="form-control" placeholder={Lang({ children: "Tap Name" })} id="" />
                 </div>
                 <div className="mb-3">
-                    <label className="form-label h5"><Lang>email</Lang>* : {loading && <Spinner />}</label>
-                    <input type="email" value={formData.email || ""} onChange={handleChange} required disabled={loading} name="email" className="form-control" placeholder={Lang({ children: "Tap email" })} id="" />
+                    <label className="form-label h5"><Lang>email</Lang> : {loading && <Spinner />}</label>
+                    <input type="email" value={formData.email || ""} onChange={handleChange} disabled={loading} name="email" className="form-control" placeholder={Lang({ children: "Tap email" })} id="" />
                 </div>
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>CIN</Lang> : {loading && <Spinner />}</label>
@@ -42,6 +42,10 @@ export function CustomerInfo({ handleClose, onNext, formData, setFormData, loadi
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>Phone</Lang> : {loading && <Spinner />}</label>
                     <input type="text" value={formData.phone || ""} onChange={handleChange} disabled={loading} name="phone" className="form-control" placeholder={Lang({ children: "Tap Phone" })} id="" />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label h5"><Lang>Birthday</Lang> : {loading && <Spinner />}</label>
+                    <input type="date" value={formData.birthday || ""} onChange={handleChange} disabled={loading} name="birthday" className="form-control" />
                 </div>
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>Sexe</Lang>* : {loading && <Spinner />}</label>
