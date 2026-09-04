@@ -112,8 +112,9 @@ export function Statistics() {
     }
 
     // Build chart labels from turnover dates
-    const turnoverLabels = stats?.turnover?.chart?.map((d) => d.date?.substring(5) || "") || [];
-    const turnoverData = stats?.turnover?.chart?.map((d) => d.total) || [];
+    const turnoverChart = Array.isArray(stats?.turnover?.chart) ? stats.turnover.chart : [];
+    const turnoverLabels = turnoverChart.map((d) => d.date?.substring(5) || "");
+    const turnoverData = turnoverChart.map((d) => d.total);
 
     // Build new customers data by gender
     const ncLabels = [...new Set(stats?.newCustomers?.chart?.map((d) => d.date?.substring(5)) || [])];
@@ -173,6 +174,27 @@ export function Statistics() {
 
             {loading ? <CustomLoader /> : (
                 <>
+                    <div className="row m-0 p-2">
+                        <div className="col-12 col-md-4 p-2">
+                            <div style={chartCardStyle}>
+                                <small className="text-muted"><Lang>Revenue received</Lang> — {getFilterLabel()}</small>
+                                <div className="h4 fw-bold text-primary-c mb-0">{Number(stats?.turnover?.total || 0).toFixed(2)} DH</div>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-4 p-2">
+                            <div style={chartCardStyle}>
+                                <small className="text-muted"><Lang>Subscription payments</Lang> — {getFilterLabel()}</small>
+                                <div className="h4 fw-bold text-success mb-0">{Number(stats?.payments?.received || 0).toFixed(2)} DH</div>
+                            </div>
+                        </div>
+                        <div className="col-12 col-md-4 p-2">
+                            <div style={chartCardStyle}>
+                                <small className="text-muted"><Lang>Outstanding balance</Lang></small>
+                                <div className="h4 fw-bold text-danger mb-0">{Number(stats?.payments?.outstanding || 0).toFixed(2)} DH</div>
+                                <small className="text-muted">{stats?.payments?.subscriptions_with_balance || 0} <Lang>subscriptions with balance</Lang></small>
+                            </div>
+                        </div>
+                    </div>
                     {/* Row 1: Turnover, New Customers, Subscriptions */}
                     <div className="row m-0 p-2">
                         <div className="col-12 col-md-4 p-2">

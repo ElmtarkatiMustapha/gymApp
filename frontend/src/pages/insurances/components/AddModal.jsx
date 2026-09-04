@@ -75,7 +75,7 @@ export function AddModal({ handleClose, onInsuranceAdded, preselectedCustomer })
                                 <Lang>Add New Insurance</Lang> ({step}/2) :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         {step === 1 ? (

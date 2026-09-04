@@ -74,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/subscriptions', [SubscriptionController::class, "create"]);
     Route::get('/subscriptions/{id}', [SubscriptionController::class, "show"]);
     Route::post('/subscriptions/update/{id}', [SubscriptionController::class, "update"]);
+    Route::post('/subscriptions/{id}/payments', [SubscriptionController::class, "addPayment"]);
     Route::delete('/subscriptions/{id}', [SubscriptionController::class, "delete"]);
     
     // Insurance routes

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAppAction, useAppState } from "../../../context/context";
 import { Lang } from "../../../assets/js/lang";
 import { Spinner } from "../../../components/Spinner";
@@ -15,6 +15,8 @@ export function AddModal({ handleClose, onSubscriptionAdded, preselectedCustomer
     const [selectedCustomer, setSelectedCustomer] = useState(preselectedCustomer || null);
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [startDate, setStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
+    const [paymentType, setPaymentType] = useState("");
+    const [amountPaid, setAmountPaid] = useState("");
 
     const appAction = useAppAction();
     const appState = useAppState();
@@ -54,14 +56,20 @@ export function AddModal({ handleClose, onSubscriptionAdded, preselectedCustomer
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!selectedCustomer || !selectedPlan) return;
+        if (!selectedCustomer || !selectedPlan || !paymentType) return;
+        if (paymentType === "partial" && (!amountPaid || Number(amountPaid) >= Number(selectedPlan.price))) {
+            appAction({ type: "SET_ERROR", payload: t("Partial payment must be greater than zero and less than the total price") });
+            return;
+        }
 
         setLoading(true);
         try {
             await api.post("/subscriptions", {
                 customer_id: selectedCustomer.id,
                 plan_id: selectedPlan.id,
-                start_at: startDate
+                start_at: startDate,
+                payment_type: paymentType,
+                amount_paid: paymentType === "partial" ? Number(amountPaid) : undefined
             });
             appAction({ type: "SET_SUCCESS", payload: "Subscription added successfully" });
             onSubscriptionAdded();
@@ -82,16 +90,16 @@ export function AddModal({ handleClose, onSubscriptionAdded, preselectedCustomer
                     <div className="modal-header d-flex justify-content-between text-primary-c">
                         <div className="modal-title">
                             <div className="title h6 fw-bold m-0" style={{ color: "var(--primary-color)" }}>
-                                <Lang>Add New Subscription</Lang> (Step {step}/2) :
+                                <Lang>Add New Subscription</Lang> (<Lang>Step</Lang> {step}/2) :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         {step === 1 ? (
                             <>
                                 <div className="mb-3">
-                                    <label className="form-label h6 fw-bold"><Lang>Search Customer</Lang> (Name or CIN) :</label>
+                                    <label className="form-label h6 fw-bold"><Lang>Search Customer</Lang> (<Lang>Name or CIN</Lang>) :</label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -135,7 +143,7 @@ export function AddModal({ handleClose, onSubscriptionAdded, preselectedCustomer
                                     >
                                         <option value="" disabled>{t("Select a plan")}</option>
                                         {plans.map(p => (
-                                            <option key={p.id} value={p.id}>{p.description} ({p.duration} mois - {p.price} DH)</option>
+                                                <option key={p.id} value={p.id}>{p.description} ({p.duration} {t("Months")} - {p.price} DH)</option>
                                         ))}
                                     </select>
                                 </div>
@@ -149,6 +157,39 @@ export function AddModal({ handleClose, onSubscriptionAdded, preselectedCustomer
                                         onChange={(e) => setStartDate(e.target.value)}
                                     />
                                 </div>
+                                <div className="mb-3">
+                                    <label className="form-label h6 fw-bold"><Lang>Payment</Lang> (*) :</label>
+                                    <select
+                                        className="form-select"
+                                        value={paymentType}
+                                        onChange={(e) => {
+                                            setPaymentType(e.target.value);
+                                            setAmountPaid("");
+                                        }}
+                                    >
+                                        <option value="" disabled>{t("Select payment type")}</option>
+                                        <option value="full">{t("Paid in full")}</option>
+                                        <option value="partial">{t("Partial payment")}</option>
+                                    </select>
+                                </div>
+                                {paymentType === "partial" && (
+                                    <div className="mb-3">
+                                        <label className="form-label h6 fw-bold"><Lang>Amount paid</Lang> (*) :</label>
+                                        <input
+                                            type="number"
+                                            className="form-control"
+                                            min="0.01"
+                                            max={Math.max(Number(selectedPlan?.price || 0) - 0.01, 0.01)}
+                                            step="0.01"
+                                            required
+                                            value={amountPaid}
+                                            onChange={(e) => setAmountPaid(e.target.value)}
+                                        />
+                                        <small className="text-muted">
+                                            <Lang>Remaining amount</Lang>: {Math.max(Number(selectedPlan?.price || 0) - Number(amountPaid || 0), 0).toFixed(2)} DH
+                                        </small>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
@@ -160,7 +201,7 @@ export function AddModal({ handleClose, onSubscriptionAdded, preselectedCustomer
                             {step === 1 ? (
                                 <ButtonBlue label={"Next"} disabled={!selectedCustomer} handleClick={handleNext} type={"button"} />
                             ) : (
-                                <ButtonBlue label={"Save"} disabled={loading || !selectedPlan} handleClick={handleSubmit} type={"button"} />
+                                <ButtonBlue label={"Save"} disabled={loading || !selectedPlan || !paymentType} handleClick={handleSubmit} type={"button"} />
                             )}
                         </div>
                     </div>

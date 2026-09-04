@@ -83,7 +83,7 @@ function ErrorMsg({children}) {
                     <div className="toast-body h6">
                         <Lang>{children}</Lang>
                     </div>
-                    <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                 </div>
             </div>
         </motion.div>
@@ -106,7 +106,7 @@ function SuccessMsg({children}) {
                     <div className="toast-body h6">
                         <Lang>{children}</Lang>
                     </div>
-                    <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                 </div>
             </div>
         </motion.div>
@@ -129,7 +129,7 @@ function WarningMsg({children}) {
                     <div className="toast-body h6">
                         <Lang>{children}</Lang>
                     </div>
-                    <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <button type="button" className="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                 </div>
             </div>
         </motion.div>

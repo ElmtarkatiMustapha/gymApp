@@ -23,6 +23,8 @@ export function AddModal({ handleClose, onCustomerAdded }) {
         plan: "",
         insurance: false,
         start_at: new Date().toISOString().split('T')[0],
+        payment_type: "",
+        amount_paid: "",
         state: 1
     });
 
@@ -36,7 +38,7 @@ export function AddModal({ handleClose, onCustomerAdded }) {
                 }
             } catch (error) {
                 console.error("Failed to fetch plans:", error);
-                if (window.toast) window.toast.error("Failed to load plans");
+                appAction({ type: "SET_ERROR", payload: "Failed to load plans" });
             } finally {
                 setPlansLoading(false);
             }

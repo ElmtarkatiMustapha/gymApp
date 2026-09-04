@@ -13,7 +13,7 @@ export function ViewModal({ handleClose, plan }) {
                                 <Lang>Plan Details</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         <div className="mb-3">
@@ -26,11 +26,11 @@ export function ViewModal({ handleClose, plan }) {
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Duration</Lang> :</label>
-                            <div className="p-2 bg-light border rounded">{plan.duration} Month</div>
+                            <div className="p-2 bg-light border rounded">{plan.duration} <Lang>Months</Lang></div>
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Description</Lang> :</label>
-                            <div className="p-2 bg-light border rounded" style={{ minHeight: '100px' }}>{plan.description || 'No description'}</div>
+                            <div className="p-2 bg-light border rounded" style={{ minHeight: '100px' }}>{plan.description || <Lang>No description</Lang>}</div>
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Color</Lang> :</label>

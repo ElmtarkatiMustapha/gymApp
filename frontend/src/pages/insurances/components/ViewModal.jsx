@@ -14,7 +14,7 @@ export function ViewModal({ handleClose, insurance }) {
                                 <Lang>Insurance details</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         <div className="mb-4">
@@ -35,7 +35,7 @@ export function ViewModal({ handleClose, insurance }) {
                             <div className="row">
                                 <div className="col-6 mb-2"><strong><Lang>Start at</Lang>:</strong> {safeFormatDate(insurance.start_at, 'N/A')}</div>
                                 <div className="col-6 mb-2"><strong><Lang>Expire at</Lang>:</strong> {safeFormatDate(insurance.expire_at, 'N/A')}</div>
-                                <div className="col-12 mb-2"><strong><Lang>State</Lang>:</strong> <span className={`badge ${insurance.state === 'Active' ? 'bg-success' : 'bg-danger'}`}>{insurance.state}</span></div>
+                                <div className="col-12 mb-2"><strong><Lang>State</Lang>:</strong> <span className={`badge ${insurance.state === 'Active' ? 'bg-success' : 'bg-danger'}`}><Lang>{insurance.state}</Lang></span></div>
                             </div>
                         </div>
                     </div>

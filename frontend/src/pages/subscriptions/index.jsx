@@ -12,6 +12,7 @@ import { FilterDate } from "../../components/FilterDate";
 import { AddModal } from "./components/AddModal";
 import { ViewModal } from "./components/ViewModal";
 import { EditModal } from "./components/EditModal";
+import { PaymentModal } from "./components/PaymentModal";
 import { DateRangeModal } from "../../components/DateRangeModal";
 import { format } from "date-fns";
 import { safeFormatDate } from "../../utils/dateFormat";
@@ -37,6 +38,28 @@ export function Subscriptions() {
         {
             name: <Lang>Price</Lang>,
             selector: row => row.price,
+            sortable: true,
+        },
+        {
+            name: <Lang>Paid</Lang>,
+            selector: row => row.paid_amount,
+            cell: row => `${Number(row.paid_amount || 0).toFixed(2)} DH`,
+            sortable: true,
+        },
+        {
+            name: <Lang>Remaining</Lang>,
+            selector: row => row.remaining_amount,
+            cell: row => `${Number(row.remaining_amount || 0).toFixed(2)} DH`,
+            sortable: true,
+        },
+        {
+            name: <Lang>Payment status</Lang>,
+            selector: row => row.payment_status,
+            cell: row => (
+                <span className={Number(row.remaining_amount) > 0 ? "text-warning-c" : "text-success-c"}>
+                    <Lang>{row.payment_status}</Lang>
+                </span>
+            ),
             sortable: true,
         },
         {
@@ -71,6 +94,18 @@ export function Subscriptions() {
             sortable: true,
         },
         {
+            name: <Lang>Payment</Lang>,
+            cell: row => Number(row.remaining_amount) > 0 ? (
+                <button className="btn btn-sm btn-outline-primary" onClick={() => {
+                    setPaymentSubscription(row);
+                    setShowPaymentModal(true);
+                }}>
+                    <Lang>Pay rest</Lang>
+                </button>
+            ) : <span className="text-success"><Lang>Paid</Lang></span>,
+            sortable: false,
+        },
+        {
             name: Lang({ children: "Actions" }),
             cell: row => <SelectAction options={appState.selectData} id={row.id} onChange={handleAction} />,
             sortable: false
@@ -91,6 +126,8 @@ export function Subscriptions() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [paymentSubscription, setPaymentSubscription] = useState(null);
     const [selectedSubscription, setSelectedSubscription] = useState(null);
     const [editedSubscriptionId, setEditedSubscriptionId] = useState(null);
 
@@ -221,6 +258,11 @@ export function Subscriptions() {
             {showAddModal && <AddModal handleClose={() => setShowAddModal(false)} onSubscriptionAdded={fetchSubscriptions} />}
             {showViewModal && <ViewModal handleClose={() => setShowViewModal(false)} subscription={selectedSubscription} />}
             {showEditModal && <EditModal handleClose={() => setShowEditModal(false)} editedSubscriptionId={editedSubscriptionId} onSubscriptionEdited={fetchSubscriptions} />}
+            {showPaymentModal && <PaymentModal
+                handleClose={() => setShowPaymentModal(false)}
+                onPaymentAdded={fetchSubscriptions}
+                subscription={paymentSubscription}
+            />}
         </div>
     )
 }

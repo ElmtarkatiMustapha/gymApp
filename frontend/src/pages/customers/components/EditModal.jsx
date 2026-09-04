@@ -30,7 +30,7 @@ export function EditModal({ handleClose, onCustomerEdited, editedCustomerId }) {
             url: "/customers/update/" + editedCustomerId,
             data: data,
             withCredentials: true
-        }).then(res => {
+        }).then(() => {
             appAction({
                 type: "SET_SUCCESS",
                 payload: "Customer updated successfully"
@@ -38,7 +38,7 @@ export function EditModal({ handleClose, onCustomerEdited, editedCustomerId }) {
             onCustomerEdited();
             handleClose();
             setLoading(false);
-        }).catch(err => {
+        }).catch(() => {
             appAction({
                 type: "SET_ERROR",
                 payload: "Failed to update customer"
@@ -76,7 +76,7 @@ export function EditModal({ handleClose, onCustomerEdited, editedCustomerId }) {
                                 <Lang>Edit Customer</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         <div className="mb-3">

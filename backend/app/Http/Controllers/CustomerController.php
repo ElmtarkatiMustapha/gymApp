@@ -15,6 +15,8 @@ use App\Mail\NotificationMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class CustomerController extends Controller
 {
@@ -213,7 +215,7 @@ class CustomerController extends Controller
 
             $search = $request->input('search');
 
-            $query = Customer::with(['subscriptions.plan', 'insurances']);
+            $query = Customer::with(['subscriptions.plan', 'subscriptions.payments', 'insurances']);
 
             // Apply Search
             if ($search) {
@@ -258,14 +260,27 @@ class CustomerController extends Controller
                     }
                 }
 
+                $paidAmount = $activeSubscription
+                    ? round((float) $activeSubscription->payments->sum('amount'), 2)
+                    : 0;
+                $remainingAmount = $activeSubscription
+                    ? max(round((float) $activeSubscription->price - $paidAmount, 2), 0)
+                    : 0;
+
                 $planData = $activeSubscription ? [
                     'name' => $activeSubscription->plan->title ?? 'N/A',
                     'expired_at' => Carbon::parse($activeSubscription->expire_at)->format('Y-m-d'),
-                    'status' => $state
+                    'status' => $state,
+                    'paid_amount' => $paidAmount,
+                    'remaining_amount' => $remainingAmount,
+                    'payment_status' => $remainingAmount <= 0 ? 'Paid' : 'Partially paid',
                     ] : [
                         'name' => 'No Plan',
                         'expired_at' => 'N/A',
-                        'status' => 'Expired'
+                        'status' => 'Expired',
+                        'paid_amount' => 0,
+                        'remaining_amount' => 0,
+                        'payment_status' => 'Paid',
                     ];
                     
                     // Find active insurance
@@ -325,11 +340,34 @@ class CustomerController extends Controller
                 "birthday" => "nullable|date",
                 "state" => "required",
                 "sexe" => "required",
-                "plan" => "required",
-                "start_at" => "required",
-                "insurance" => "required"
+                "plan" => "required|exists:plans,id",
+                "start_at" => "required|date",
+                "insurance" => "required",
+                "payment_type" => "nullable|in:full,partial",
+                "amount_paid" => "required_if:payment_type,partial|nullable|numeric|gt:0",
             ]);
             $user = Auth::user();
+            $plan = Plan::findOrFail($validateFields['plan']);
+            $paymentType = $validateFields['payment_type'] ?? 'full';
+            $amountPaid = $paymentType === 'full'
+                ? (float) $plan->price
+                : round((float) ($validateFields['amount_paid'] ?? 0), 2);
+
+            if ($paymentType === 'partial' && ($amountPaid <= 0 || $amountPaid >= (float) $plan->price)) {
+                throw ValidationException::withMessages([
+                    'amount_paid' => ['A partial payment must be greater than zero and less than the subscription price.'],
+                ]);
+            }
+
+            $settingsPath = resource_path('js/settings.json');
+            if (!File::exists($settingsPath)) {
+                throw new Exception("Settings file not found");
+            }
+            $settings = json_decode(File::get($settingsPath), true);
+            $insurancePrice = (float) ($settings['insurance']['price'] ?? 0);
+            $insurancePeriod = (int) ($settings['insurance']['periode'] ?? 12);
+
+            DB::beginTransaction();
             //create customer
             $customer = Customer::create([
                 "name" => $validateFields['name'],
@@ -344,7 +382,6 @@ class CustomerController extends Controller
             ]);
             //subscription in a plan 
             //get the plan info
-            $plan = Plan::find($validateFields['plan']);
             //create subscription 
             $start_at = Carbon::parse($validateFields['start_at']);
             $subscription = Subscription::create([
@@ -356,18 +393,25 @@ class CustomerController extends Controller
                 "plan_id"=>$plan->id,
                 "customer_id"=>$customer->id
             ]);
+            $subscription->payments()->create([
+                'user_id' => $user->id,
+                'amount' => $amountPaid,
+                'paid_at' => Carbon::today()->toDateString(),
+            ]);
             //pay insurance
             $insuranceStatus = 'Inactive';
             if(isset($validateFields['insurance']) && ((bool)$validateFields['insurance'])){
                 $insurance = Insurance::create([
                     "start_at"=>$validateFields['start_at'],
-                    "expire_at"=>$start_at->copy()->addMonths(12),
-                    "price"=>100,
+                    "expire_at"=>$start_at->copy()->addMonths($insurancePeriod),
+                    "price"=>$insurancePrice,
+                    "peride"=>$insurancePeriod,
                     "user_id"=>$user->id,
                     "customer_id"=>$customer->id,
                 ]);
                 $insuranceStatus = 'Active';
             }
+            DB::commit();
             // Return formatted data matching the index() shape
             $formattedCustomer = [
                 'id' => $customer->id,
@@ -382,11 +426,17 @@ class CustomerController extends Controller
                 'plan' => [
                     'name' => $plan->title ?? 'N/A',
                     'expired_at' => $subscription->expire_at,
+                    'paid_amount' => $amountPaid,
+                    'remaining_amount' => max(round((float) $subscription->price - $amountPaid, 2), 0),
+                    'payment_status' => $amountPaid >= (float) $subscription->price ? 'Paid' : 'Partially paid',
                 ],
                 'notice_times' => 0,
             ];
             return response(["message" => "success", "data" => $formattedCustomer], Response::HTTP_OK);
         }catch(Exception $err){
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
             return response(["message" => $err->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
@@ -468,7 +518,13 @@ class CustomerController extends Controller
             $startDate = $request->input('startDate');
             $endDate = $request->input('endDate');
 
-            $customer = Customer::with(['subscriptions.plan', 'insurances'])->findOrFail($id);
+            $customer = Customer::with([
+                'subscriptions.plan',
+                'subscriptions.payments' => function ($query) {
+                    $query->orderByDesc('paid_at')->orderByDesc('id');
+                },
+                'insurances'
+            ])->findOrFail($id);
 
             // Active Subscription (latest)
             $activeSubscription = $customer->subscriptions->sortByDesc('start_at')->first();
@@ -518,8 +574,32 @@ class CustomerController extends Controller
                 });
             };
 
-            $subscriptionsHistory = $applyFilter($customer->subscriptions()->with('plan')->getQuery())->get();
+            $subscriptionsHistory = $applyFilter($customer->subscriptions()->with([
+                'plan',
+                'payments' => function ($query) {
+                    $query->orderByDesc('paid_at')->orderByDesc('id');
+                }
+            ])->getQuery())->get();
+            $subscriptionsHistory->each(function ($subscription) {
+                $paidAmount = round((float) $subscription->payments->sum('amount'), 2);
+                $subscription->setAttribute('paid_amount', $paidAmount);
+                $subscription->setAttribute(
+                    'remaining_amount',
+                    max(round((float) $subscription->price - $paidAmount, 2), 0)
+                );
+                $subscription->setAttribute(
+                    'payment_status',
+                    (float) $subscription->remaining_amount <= 0 ? 'Paid' : 'Partially paid'
+                );
+            });
             $insurancesHistory = $applyFilter($customer->insurances()->getQuery())->get();
+
+            $activePaidAmount = $activeSubscription
+                ? round((float) $activeSubscription->payments->sum('amount'), 2)
+                : 0;
+            $activeRemainingAmount = $activeSubscription
+                ? max(round((float) $activeSubscription->price - $activePaidAmount, 2), 0)
+                : 0;
 
             return response([
                 "message" => "success",
@@ -541,6 +621,10 @@ class CustomerController extends Controller
                         "name" => $activeSubscription->plan->title ?? 'N/A',
                         "duration" => $activeSubscription->duration,
                         "price" => $activeSubscription->price,
+                        "paid_amount" => $activePaidAmount,
+                        "remaining_amount" => $activeRemainingAmount,
+                        "payment_status" => $activeRemainingAmount <= 0 ? 'Paid' : 'Partially paid',
+                        "payments" => $activeSubscription->payments,
                         "color" => $activeSubscription->plan->color,
                         "start_at" => Carbon::parse($activeSubscription->start_at)->format('d-m-Y'),
                         "expire_at" => Carbon::parse($activeSubscription->expire_at)->format('d-m-Y'),

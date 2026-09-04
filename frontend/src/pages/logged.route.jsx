@@ -6,6 +6,7 @@ import { CustomersRoute } from "./customers/customers.route";
 import { SubscriptionsRoute } from "./subscriptions/subscriptions.route";
 import { InsurancesRoute } from "./insurances/insurances.route";
 import "../assets/css/pages.css"
+import { Lang } from "../assets/js/lang";
 export function LoggedRoute() {
     return (
         <PagesContainer>
@@ -16,7 +17,7 @@ export function LoggedRoute() {
                 <Route path="/Customers/*" element={<CustomersRoute />} />
                 <Route path="/subscriptions/*" element={<SubscriptionsRoute />} />
                 <Route path="/insurances/*" element={<InsurancesRoute />} />
-                <Route path="/profile" element={<h1>profile</h1>} />
+                <Route path="/profile" element={<h1><Lang>Profile</Lang></h1>} />
             </Routes>
         </PagesContainer>
     )

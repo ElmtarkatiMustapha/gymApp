@@ -3,12 +3,14 @@ import { Lang } from "../../../assets/js/lang";
 import { ButtonBlue } from "../../../components/ButtonBlue";
 import { Spinner } from "../../../components/Spinner";
 import api from "../../../api/api";
-import { useAppAction } from "../../../context/context";
+import { useAppAction, useAppState } from "../../../context/context";
 // import { toast } from "react-hot-toast";
 
 export function AddModal({ handleClose, onPlanAdded }) {
     const [loading, setLoading] = useState(false);
     const appAction = useAppAction()
+    const appState = useAppState();
+    const t = (key) => appState.langData[key] || key;
     const [formData, setFormData] = useState({
         title: "",
         price: "",
@@ -48,7 +50,7 @@ export function AddModal({ handleClose, onPlanAdded }) {
                 }
                 handleClose();
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to add plan:", error.message);
             appAction({ type: "SET_ERROR", payload: "Failed to add plan. Please check the fields" });
             // if (window.toast) window.toast.error("Failed to add plan. Please check the fields.");
@@ -68,7 +70,7 @@ export function AddModal({ handleClose, onPlanAdded }) {
                                 <Lang>Add Plan</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         <div className="mb-3">
@@ -81,7 +83,7 @@ export function AddModal({ handleClose, onPlanAdded }) {
                                 required
                                 disabled={loading}
                                 className="form-control"
-                                placeholder="Ex: Basic"
+                                placeholder={t("Ex: Basic")}
                             />
                         </div>
                         <div className="mb-3">
@@ -95,7 +97,7 @@ export function AddModal({ handleClose, onPlanAdded }) {
                                 required
                                 disabled={loading}
                                 className="form-control"
-                                placeholder="Tap price"
+                                placeholder={t("Tap price")}
                             />
                         </div>
                         <div className="mb-3">
@@ -108,7 +110,7 @@ export function AddModal({ handleClose, onPlanAdded }) {
                                 required
                                 disabled={loading}
                                 className="form-control"
-                                placeholder="Tap duration"
+                                placeholder={t("Tap duration")}
                             />
                         </div>
                         <div className="mb-3">
@@ -119,7 +121,7 @@ export function AddModal({ handleClose, onPlanAdded }) {
                                 onChange={handleChange}
                                 disabled={loading}
                                 className="form-control"
-                                placeholder="Tap Description"
+                                placeholder={t("Tap Description")}
                                 rows="4"
                             ></textarea>
                         </div>

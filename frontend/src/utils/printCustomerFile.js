@@ -11,7 +11,6 @@ function safeFormatDate(value, fallback = "-") {
 
 export function printCustomerFile({
     customerData,
-    activePlan,
     subscriptionsHistory,
     insurancesHistory,
     settings,
@@ -71,6 +70,8 @@ export function printCustomerFile({
                     <td>${sub.plan?.title || sub.plan?.description || "N/A"}</td>
                     <td>${sub.duration || 0} ${langData["Month"] || "Month"}</td>
                     <td>${sub.price || 0} DH</td>
+                    <td>${Number(sub.paid_amount || 0).toFixed(2)} DH</td>
+                    <td>${Number(sub.remaining_amount || 0).toFixed(2)} DH</td>
                     <td>${startStr}</td>
                     <td>${expireStr}</td>
                     <td><span class="badge ${badgeClass}">${state}</span></td>
@@ -244,6 +245,8 @@ export function printCustomerFile({
                         <th>${langData["Plan"] || "Plan"}</th>
                         <th>${langData["Duration"] || "Duration"}</th>
                         <th>${langData["Price"] || "Price"}</th>
+                        <th>${langData["Paid"] || "Paid"}</th>
+                        <th>${langData["Remaining"] || "Remaining"}</th>
                         <th>${langData["Start At"] || "Start At"}</th>
                         <th>${langData["Expire At"] || "Expire At"}</th>
                         <th>${langData["Status"] || "Status"}</th>
@@ -305,7 +308,7 @@ export function printCustomerFile({
         try {
             iframe.contentWindow.focus();
             iframe.contentWindow.print();
-        } catch (e) {
+        } catch {
             // Fallback for very strict environments
             window.print();
         }

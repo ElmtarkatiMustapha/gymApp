@@ -2,6 +2,7 @@ import api, { getImageURL } from "../api/api";
 import { useAppAction, useAppState } from "../context/context";
 import { ButtonDanger } from "./ButtonDanger";
 import { LangSelect } from "./LangSelect";
+import { Lang } from "../assets/js/lang";
 export function RightMenu() {
     /**
      * @desc handle logout 
@@ -33,7 +34,7 @@ export function RightMenu() {
         <div className="offcanvas offcanvas-end rightMenu" data-bs-backdrop="static" tabIndex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
             <div className="offcanvas-header">
                 {/* <h3 className="offcanvas-title h3 " id="offcanvasRightLabel"> <Lang>Hello!!</Lang> </h3> */}
-                <button id="closeProfileMenu" type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button id="closeProfileMenu" type="button" className="btn-close" data-bs-dismiss="offcanvas"><span className="visually-hidden"><Lang>Close</Lang></span></button>
             </div>
             <div className="offcanvas-body">
                 <div className="container-fluid">

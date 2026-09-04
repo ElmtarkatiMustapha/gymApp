@@ -22,7 +22,7 @@ export function MobileSidebar(){
                         <img src={Logo} alt="" className="logo" fetchPriority="high" />
                     </Link>
                 </div>
-                <button id="closeProfileMenu" type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                <button id="closeProfileMenu" type="button" className="btn-close" data-bs-dismiss="offcanvas"><span className="visually-hidden"><Lang>Close</Lang></span></button>
             </div>
             <div className="offcanvas-body">
                 <nav className=" d-flex flex-column flex-shrink-0 position-fixed">

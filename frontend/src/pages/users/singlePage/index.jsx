@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import api, { getImageURL } from "../../../api/api";
 import { useAppAction, useAppState } from "../../../context/context";
 import { Lang } from "../../../assets/js/lang";
@@ -16,7 +16,6 @@ import { CustomLoader } from "../../../components/CustomLoader";
 
 export function SingleUser() {
     const { id } = useParams();
-    const navigate = useNavigate();
     const appState = useAppState();
     const appAction = useAppAction();
 
@@ -44,21 +43,21 @@ export function SingleUser() {
 
     const subscriptionColumns = [
         { name: '#', selector: (row, index) => index + 1, width: '50px' },
-        { name: 'Plan', selector: row => row.plan?.description || 'N/A' },
-        { name: 'Customer', selector: row => row.customer?.name || 'N/A' },
-        { name: 'Duration', selector: row => (row.duration || 0) + " mois" },
-        { name: 'Total (DH)', selector: row => row.price },
-        { name: 'Start at', selector: row => safeFormatDate(row.start_at, 'N/A') },
-        { name: 'Expire at', selector: row => safeFormatDate(row.expire_at, 'N/A') }
+        { name: <Lang>Plan</Lang>, selector: row => row.plan?.description || 'N/A' },
+        { name: <Lang>Customer</Lang>, selector: row => row.customer?.name || 'N/A' },
+        { name: <Lang>Duration</Lang>, selector: row => row.duration || 0, cell: row => <>{row.duration || 0} <Lang>Months</Lang></> },
+        { name: <><Lang>Total</Lang> (DH)</>, selector: row => row.price },
+        { name: <Lang>Start at</Lang>, selector: row => safeFormatDate(row.start_at, 'N/A') },
+        { name: <Lang>Expire at</Lang>, selector: row => safeFormatDate(row.expire_at, 'N/A') }
     ];
 
     const insuranceColumns = [
         { name: '#', selector: (row, index) => index + 1, width: '50px' },
-        { name: 'Price (DH)', selector: row => row.price },
-        { name: 'Customer', selector: row => row.customer?.name || 'N/A' },
-        { name: 'Duration', selector: row => appState.settings?.insurance.periode + " Months" || "N/A" },
-        { name: 'Start at', selector: row => safeFormatDate(row.start_at, 'N/A') },
-        { name: 'Expire at', selector: row => safeFormatDate(row.expire_at, 'N/A') }
+        { name: <><Lang>Price</Lang> (DH)</>, selector: row => row.price },
+        { name: <Lang>Customer</Lang>, selector: row => row.customer?.name || 'N/A' },
+        { name: <Lang>Duration</Lang>, selector: () => appState.settings?.insurance.periode || 0, cell: () => <>{appState.settings?.insurance.periode || 0} <Lang>Months</Lang></> },
+        { name: <Lang>Start at</Lang>, selector: row => safeFormatDate(row.start_at, 'N/A') },
+        { name: <Lang>Expire at</Lang>, selector: row => safeFormatDate(row.expire_at, 'N/A') }
     ];
 
     const fetchDetails = async () => {
@@ -103,9 +102,7 @@ export function SingleUser() {
     };
 
     if (loading && !userData) return <div className="text-center p-5"><CustomLoader /></div>;
-    if (!userData) return <div className="text-center p-5">User not found</div>;
-
-    const isSelf = appState.currentUser?.id == userData.id;
+    if (!userData) return <div className="text-center p-5"><Lang>User not found</Lang></div>;
 
     return (
         <>
@@ -157,7 +154,7 @@ export function SingleUser() {
                                                 </div>
                                                 <div className="col-6 mb-3">
                                                     <span className="fw-bold text-primary-c me-2"><Lang>Sexe</Lang>:</span>
-                                                    <span className="text-muted">{userData.sexe}</span>
+                                                    <span className="text-muted"><Lang>{userData.sexe}</Lang></span>
                                                 </div>
                                                 <div className="col-6 mb-3">
                                                     <span className="fw-bold text-primary-c me-2"><Lang>Phone</Lang>:</span>
@@ -165,7 +162,7 @@ export function SingleUser() {
                                                 </div>
                                                 <div className="col-6 mb-3">
                                                     <span className="fw-bold text-primary-c me-2"><Lang>Role</Lang>:</span>
-                                                    <span className="text-muted">{userData.role?.title || 'N/A'}</span>
+                                                    <span className="text-muted"><Lang>{userData.role?.title || 'N/A'}</Lang></span>
                                                 </div>
                                                 <div className="col-6 mb-3">
                                                     <span className="fw-bold text-primary-c me-2"><Lang>Email</Lang>:</span>

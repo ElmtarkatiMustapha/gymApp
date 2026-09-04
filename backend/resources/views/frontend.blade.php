@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>gym-app</title>
-    <script type="module" crossorigin src="/assets/index-D8Y1iIiB.js"></script>
+    <script type="module" crossorigin src="/assets/index-BRbvEAkZ.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-BibMvPYU.css">
   </head>
   <body>

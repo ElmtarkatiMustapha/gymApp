@@ -42,7 +42,7 @@ export function EmailSettingsModal({ data, onClose, onUpdate }) {
                                 <Lang>Edit Email Settings</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={onClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={onClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body p-4">
                         <div className="mb-3">

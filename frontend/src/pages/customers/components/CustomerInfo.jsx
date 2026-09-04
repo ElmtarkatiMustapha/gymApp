@@ -1,8 +1,11 @@
 import { Lang } from "../../../assets/js/lang"
 import { ButtonBlue } from "../../../components/ButtonBlue"
 import { Spinner } from "../../../components/Spinner"
+import { useAppState } from "../../../context/context"
 
 export function CustomerInfo({ handleClose, onNext, formData, setFormData, loading, }) {
+    const appState = useAppState();
+    const t = (key) => appState.langData[key] || key;
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -20,28 +23,28 @@ export function CustomerInfo({ handleClose, onNext, formData, setFormData, loadi
                     <div className="title h3 m-0"><Lang>Add Customer</Lang></div>
                     <div className="sub-title"><Lang>Personal informations</Lang></div>
                 </div>
-                <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
             </div>
             <div className="modal-body">
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>Name</Lang>* : {loading && <Spinner />}</label>
-                    <input type="text" value={formData.name || ""} onChange={handleChange} required disabled={loading} name="name" className="form-control" placeholder={Lang({ children: "Tap Name" })} id="" />
+                    <input type="text" value={formData.name || ""} onChange={handleChange} required disabled={loading} name="name" className="form-control" placeholder={t("Tap Name")} id="" />
                 </div>
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>email</Lang> : {loading && <Spinner />}</label>
-                    <input type="email" value={formData.email || ""} onChange={handleChange} disabled={loading} name="email" className="form-control" placeholder={Lang({ children: "Tap email" })} id="" />
+                    <input type="email" value={formData.email || ""} onChange={handleChange} disabled={loading} name="email" className="form-control" placeholder={t("Tap email")} id="" />
                 </div>
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>CIN</Lang> : {loading && <Spinner />}</label>
-                    <input type="text" value={formData.cin || ""} onChange={handleChange} disabled={loading} name="cin" className="form-control" placeholder={Lang({ children: "Tap CIN" })} id="" />
+                    <input type="text" value={formData.cin || ""} onChange={handleChange} disabled={loading} name="cin" className="form-control" placeholder={t("Tap CIN")} id="" />
                 </div>
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>Adresse</Lang> : {loading && <Spinner />}</label>
-                    <input type="text" value={formData.adresse || ""} onChange={handleChange} disabled={loading} name="adresse" className="form-control" placeholder={Lang({ children: "Tap Adresse" })} id="" />
+                    <input type="text" value={formData.adresse || ""} onChange={handleChange} disabled={loading} name="adresse" className="form-control" placeholder={t("Tap Adresse")} id="" />
                 </div>
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>Phone</Lang> : {loading && <Spinner />}</label>
-                    <input type="text" value={formData.phone || ""} onChange={handleChange} disabled={loading} name="phone" className="form-control" placeholder={Lang({ children: "Tap Phone" })} id="" />
+                    <input type="text" value={formData.phone || ""} onChange={handleChange} disabled={loading} name="phone" className="form-control" placeholder={t("Tap Phone")} id="" />
                 </div>
                 <div className="mb-3">
                     <label className="form-label h5"><Lang>Birthday</Lang> : {loading && <Spinner />}</label>

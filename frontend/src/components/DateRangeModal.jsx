@@ -13,7 +13,7 @@ export function DateRangeModal({ state, handleChange, handleSubmit, handleClose 
                             <div className="title h3 m-0"><Lang>Chose Range Date</Lang> :</div>
                             {/* <div className="sub-title"><Lang>Fill in the fields</Lang> :</div> */}
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close" data-bs-dismiss="modal"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body text-center">
                         <DateRange

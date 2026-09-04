@@ -19,6 +19,8 @@ export function ChoosePlan({ plans, formData, setFormData, onPrevious, onSubmit,
         setFormData(prev => ({ ...prev, start_at: e.target.value }));
     };
 
+    const selectedPlan = plans.find(plan => String(plan.id) === String(formData.plan));
+
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!formData.plan) {
@@ -29,15 +31,15 @@ export function ChoosePlan({ plans, formData, setFormData, onPrevious, onSubmit,
             alert("Please enter a start date");
             return;
         }
-        onSubmit();
-    };
-
-    const getDurationLabel = (months) => {
-        if (months >= 12) {
-            const years = Math.floor(months / 12);
-            return years === 1 ? "1 An" : `${years} Ans`;
+        if (!formData.payment_type) {
+            alert(state.langData["Please select payment type"] || "Please select payment type");
+            return;
         }
-        return `${months} Month`;
+        if (formData.payment_type === "partial" && (!formData.amount_paid || Number(formData.amount_paid) >= Number(selectedPlan?.price))) {
+            alert(state.langData["Partial payment must be greater than zero and less than the total price"] || "Partial payment must be greater than zero and less than the total price");
+            return;
+        }
+        onSubmit();
     };
 
     return (
@@ -47,7 +49,7 @@ export function ChoosePlan({ plans, formData, setFormData, onPrevious, onSubmit,
                     <div className="title h3 m-0"><Lang>Add Customer</Lang></div>
                     <div className="sub-title"><Lang>Chose Plan</Lang></div>
                 </div>
-                <button type="button" onClick={onPrevious} className="btn-close" aria-label="Close"></button>
+                <button type="button" onClick={onPrevious} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
             </div>
             <div className="modal-body">
                 {plansLoading ? (
@@ -74,8 +76,8 @@ export function ChoosePlan({ plans, formData, setFormData, onPrevious, onSubmit,
                                         </span>
                                     </div>
                                     <div className="plan-card-body">
-                                        <div>Duration: {getDurationLabel(plan.duration)}</div>
-                                        <div>Price: {plan.price} DH</div>
+                                        <div><Lang>Duration</Lang>: {plan.duration} <Lang>Months</Lang></div>
+                                        <div><Lang>Price</Lang>: {plan.price} DH</div>
                                     </div>
                                 </div>
                             ))}
@@ -99,10 +101,45 @@ export function ChoosePlan({ plans, formData, setFormData, onPrevious, onSubmit,
                                 value={formData.start_at}
                                 onChange={handleStartAtChange}
                                 className="form-control"
-                                placeholder="Ex: 16/02/2026"
+                                placeholder={state.langData["Ex: 16/02/2026"] || "Ex: 16/02/2026"}
                                 required
                             />
                         </div>
+                        <div className="mb-3">
+                            <label className="form-label h5"><Lang>Payment</Lang>* :</label>
+                            <select
+                                className="form-select"
+                                required
+                                value={formData.payment_type}
+                                onChange={(e) => setFormData(prev => ({
+                                    ...prev,
+                                    payment_type: e.target.value,
+                                    amount_paid: ""
+                                }))}
+                            >
+                                <option value="" disabled>{state.langData["Select payment type"] || "Select payment type"}</option>
+                                <option value="full">{state.langData["Paid in full"] || "Paid in full"}</option>
+                                <option value="partial">{state.langData["Partial payment"] || "Partial payment"}</option>
+                            </select>
+                        </div>
+                        {formData.payment_type === "partial" && (
+                            <div className="mb-3">
+                                <label className="form-label h5"><Lang>Amount paid</Lang>* :</label>
+                                <input
+                                    type="number"
+                                    min="0.01"
+                                    max={Math.max(Number(selectedPlan?.price || 0) - 0.01, 0.01)}
+                                    step="0.01"
+                                    required
+                                    className="form-control"
+                                    value={formData.amount_paid}
+                                    onChange={(e) => setFormData(prev => ({ ...prev, amount_paid: e.target.value }))}
+                                />
+                                <small className="text-muted">
+                                    <Lang>Remaining amount</Lang>: {Math.max(Number(selectedPlan?.price || 0) - Number(formData.amount_paid || 0), 0).toFixed(2)} DH
+                                </small>
+                            </div>
+                        )}
                     </>
                 )}
             </div>

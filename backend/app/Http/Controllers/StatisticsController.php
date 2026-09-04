@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Subscription;
+use App\Models\SubscriptionPayment;
 use App\Models\Customer;
 use App\Models\Plan;
 use App\Models\Insurance;
@@ -48,12 +49,15 @@ class StatisticsController extends Controller
                 $endDate = Carbon::parse($endDateParam)->endOfDay();
             }
 
-            // Turnover: revenue based on created_at from both Subscriptions and Insurances
-            $subTurnoverQuery = Subscription::query();
+            // Turnover: actual subscription payments by payment date, plus insurance sales.
+            $subTurnoverQuery = SubscriptionPayment::query();
             if ($startDate && $endDate) {
-                $subTurnoverQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $subTurnoverQuery->whereBetween('paid_at', [
+                    $startDate->toDateString(),
+                    $endDate->toDateString(),
+                ]);
             }
-            $subTurnover = $subTurnoverQuery->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(price) as total'))
+            $subTurnover = $subTurnoverQuery->select(DB::raw('DATE(paid_at) as date'), DB::raw('SUM(amount) as total'))
                 ->groupBy('date')
                 ->get();
 
@@ -73,8 +77,8 @@ class StatisticsController extends Controller
                         'total' => $items->sum('total')
                     ];
                 })
-                ->values()
                 ->sortBy('date') // Ensure order for chart
+                ->values() // Re-index after sorting so JSON is always an array, not an object
                 ->toArray();
 
             // New customers per day basd on created_at
@@ -135,15 +139,32 @@ class StatisticsController extends Controller
                 ->get();
 
             // Total turnover
-            $totalSubTurnoverQuery = Subscription::query();
+            $totalSubTurnoverQuery = SubscriptionPayment::query();
             $totalInsTurnoverQuery = Insurance::query();
             if ($startDate && $endDate) {
-                $totalSubTurnoverQuery->whereBetween('created_at', [$startDate, $endDate]);
+                $totalSubTurnoverQuery->whereBetween('paid_at', [
+                    $startDate->toDateString(),
+                    $endDate->toDateString(),
+                ]);
                 $totalInsTurnoverQuery->whereBetween('created_at', [$startDate, $endDate]);
             }
-            $totalSubTurnover = $totalSubTurnoverQuery->sum('price');
+            $totalSubTurnover = $totalSubTurnoverQuery->sum('amount');
             $totalInsTurnover = $totalInsTurnoverQuery->sum('price');
             $totalTurnover = $totalSubTurnover + $totalInsTurnover;
+
+            // Outstanding subscription balance is a current snapshot, independent of date filters.
+            $subscriptionBalances = Subscription::withSum('payments', 'amount')->get();
+            $outstandingBalance = round($subscriptionBalances->sum(function ($subscription) {
+                return max(
+                    (float) $subscription->price - (float) ($subscription->payments_sum_amount ?? 0),
+                    0
+                );
+            }), 2);
+            $subscriptionsWithBalance = $subscriptionBalances
+                ->filter(function ($subscription) {
+                    return (float) $subscription->price > (float) ($subscription->payments_sum_amount ?? 0);
+                })
+                ->count();
 
             // Total subscriptions this period
             $totalSubscriptionsQuery = Subscription::query();
@@ -165,6 +186,13 @@ class StatisticsController extends Controller
                     "turnover" => [
                         "chart" => $turnover,
                         "total" => $totalTurnover,
+                        "subscriptions" => $totalSubTurnover,
+                        "insurances" => $totalInsTurnover,
+                    ],
+                    "payments" => [
+                        "received" => $totalSubTurnover,
+                        "outstanding" => $outstandingBalance,
+                        "subscriptions_with_balance" => $subscriptionsWithBalance,
                     ],
                     "newCustomers" => [
                         "chart" => $newCustomers,

@@ -4,6 +4,7 @@ import { UsersRoute } from "./users/users.route";
 import { StatisticsRoute } from "./statistics/statistics.route";
 import { SettingsRoute } from "./settings/settings.route";
 import { Dashboard } from "./dashboard/index";
+import { Lang } from "../assets/js/lang";
 
 export function AdminRoute() {
     return (
@@ -14,7 +15,7 @@ export function AdminRoute() {
                 <Route path="/statistics/*" element={<StatisticsRoute />} />
                 <Route path="/users/*" element={<UsersRoute />} />
                 <Route path="/plans/*" element={<PlansRoute />} />
-                <Route path="/*" element={<h1>Not Found 4O4</h1>} />
+                <Route path="/*" element={<h1><Lang>Not Found 404</Lang></h1>} />
             </Routes>
         </>
     )

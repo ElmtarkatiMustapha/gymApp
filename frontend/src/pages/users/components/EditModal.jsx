@@ -62,7 +62,7 @@ export function EditModal({ handleClose, onUserEdited, editedUser }) {
             onUserEdited();
             handleClose();
             setLoading(false);
-        }).catch(err => {
+        }).catch(() => {
             appAction({
                 type: "SET_ERROR",
                 payload: "Failed to update user"
@@ -104,12 +104,12 @@ export function EditModal({ handleClose, onUserEdited, editedUser }) {
                                 <Lang>Edit User</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Name</Lang> (*) : {loading && <Spinner />}</label>
-                            <input type="text" name="name" required defaultValue={formData.name} disabled={loading} className="form-control" placeholder="Ex: mustapha el mtarkati" />
+                            <input type="text" name="name" required defaultValue={formData.name} disabled={loading} className="form-control" placeholder={t("Ex: mustapha el mtarkati")} />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h5"><Lang>Email</Lang> (*) : {loading && <Spinner />}</label>
