@@ -53,7 +53,6 @@ const kpiCardStyle = (color) => ({
 
 export function Dashboard() {
     const [stats, setStats] = useState(null);
-    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const appState = useAppState();
 
@@ -63,12 +62,8 @@ export function Dashboard() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const [statsRes, usersRes] = await Promise.all([
-                api.get("/statistics", { params: { filter: "month" } }),
-                api.get("/users"),
-            ]);
+            const statsRes = await api.get("/statistics", { params: { filter: "month" } });
             if (statsRes.data?.data) setStats(statsRes.data.data);
-            if (usersRes.data?.data) setUsers(usersRes.data.data);
         } catch (error) {
             console.error("Failed to fetch dashboard:", error);
         } finally {
@@ -89,8 +84,9 @@ export function Dashboard() {
     }
 
     // Turnover chart
-    const turnoverLabels = stats?.turnover?.chart?.map((d) => d.date?.substring(5) || "") || [];
-    const turnoverData = stats?.turnover?.chart?.map((d) => d.total) || [];
+    const turnoverChart = Array.isArray(stats?.turnover?.chart) ? stats.turnover.chart : [];
+    const turnoverLabels = turnoverChart.map((d) => d.date?.substring(5) || "");
+    const turnoverData = turnoverChart.map((d) => d.total);
 
     // New customers chart
     const ncLabels = [...new Set(stats?.newCustomers?.chart?.map((d) => d.date?.substring(5)) || [])];
@@ -128,10 +124,6 @@ export function Dashboard() {
         return found ? found.count : 0;
     });
 
-    // User turnover summary
-    const totalUsers = users.length;
-    const activeUsers = users.filter(u => u.active == 1 || u.active === true).length;
-
     const lineOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -159,7 +151,7 @@ export function Dashboard() {
                 <>
                     {/* KPI Row */}
                     <div className="row m-0 p-2 g-3">
-                        <div className="col-6 col-md-3">
+                        <div className="col-6 col-md-4 col-xl-2">
                             <div style={kpiCardStyle("#f0920a")}>
                                 {/* <span style={{ fontSize: "1.6rem" }}>💰</span> */}
                                 <div className="fw-bold" style={{ fontSize: "1.4rem", color: "#1a3a4a" }}>
@@ -168,7 +160,7 @@ export function Dashboard() {
                                 <small className="text-muted"><Lang>Turnover</Lang></small>
                             </div>
                         </div>
-                        <div className="col-6 col-md-3">
+                        <div className="col-6 col-md-4 col-xl-2">
                             <div style={kpiCardStyle("#4CAF50")}>
                                 {/* <span style={{ fontSize: "1.6rem" }}>👥</span> */}
                                 <div className="fw-bold" style={{ fontSize: "1.4rem", color: "#1a3a4a" }}>
@@ -177,7 +169,7 @@ export function Dashboard() {
                                 <small className="text-muted"><Lang>New Customers</Lang></small>
                             </div>
                         </div>
-                        <div className="col-6 col-md-3">
+                        <div className="col-6 col-md-4 col-xl-2">
                             <div style={kpiCardStyle("#2196F3")}>
                                 {/* <span style={{ fontSize: "1.6rem" }}>📋</span> */}
                                 <div className="fw-bold" style={{ fontSize: "1.4rem", color: "#1a3a4a" }}>
@@ -186,13 +178,29 @@ export function Dashboard() {
                                 <small className="text-muted"><Lang>Subscriptions</Lang></small>
                             </div>
                         </div>
-                        <div className="col-6 col-md-3">
+                        <div className="col-6 col-md-4 col-xl-2">
                             <div style={kpiCardStyle("#9C27B0")}>
                                 {/* <span style={{ fontSize: "1.6rem" }}>✅</span> */}
                                 <div className="fw-bold" style={{ fontSize: "1.4rem", color: "#1a3a4a" }}>
                                     {stateData.Active || 0}
                                 </div>
                                 <small className="text-muted"><Lang>Active Subscribers</Lang></small>
+                            </div>
+                        </div>
+                        <div className="col-6 col-md-4 col-xl-2">
+                            <div style={kpiCardStyle("#00897B")}>
+                                <div className="fw-bold" style={{ fontSize: "1.4rem", color: "#1a3a4a" }}>
+                                    {stats?.payments?.received || 0} <small style={{ fontSize: "0.8rem" }}>dh</small>
+                                </div>
+                                <small className="text-muted"><Lang>Subscription payments</Lang></small>
+                            </div>
+                        </div>
+                        <div className="col-6 col-md-4 col-xl-2">
+                            <div style={kpiCardStyle("#E53935")}>
+                                <div className="fw-bold" style={{ fontSize: "1.4rem", color: "#1a3a4a" }}>
+                                    {stats?.payments?.outstanding || 0} <small style={{ fontSize: "0.8rem" }}>dh</small>
+                                </div>
+                                <small className="text-muted"><Lang>Outstanding balance</Lang></small>
                             </div>
                         </div>
                     </div>

@@ -9,8 +9,9 @@ export function LangSelect() {
     const state = useAppState();
     const dispatch = useAppAction();
     const handleLang = (e) => {
-        console.log("change lang")
-        fetch(`/langs/${e.target.value}`)
+        fetch(`/langs/${e.target.value}?v=${Date.now()}`, {
+            cache: "no-store",
+        })
             .then((res) => {
                 return res.json();
             })

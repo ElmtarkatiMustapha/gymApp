@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Subscription extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         "id",
         "start_at",
@@ -30,5 +31,8 @@ class Subscription extends Model
     }
     public function customer(){
         return $this->belongsTo(Customer::class);
+    }
+    public function payments(){
+        return $this->hasMany(SubscriptionPayment::class);
     }
 }

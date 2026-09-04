@@ -97,6 +97,22 @@ export function Customers() {
             sortable: true,
         },
         {
+            name: <Lang>Paid</Lang>,
+            selector: row => row.plan?.paid_amount,
+            cell: row => `${Number(row.plan?.paid_amount || 0).toFixed(2)} DH`,
+            sortable: true,
+        },
+        {
+            name: <Lang>Remaining</Lang>,
+            selector: row => row.plan?.remaining_amount,
+            cell: row => (
+                <span className={Number(row.plan?.remaining_amount) > 0 ? 'text-warning-c' : 'text-success-c'}>
+                    {Number(row.plan?.remaining_amount || 0).toFixed(2)} DH
+                </span>
+            ),
+            sortable: true,
+        },
+        {
             name: <Lang>Notice Times</Lang>,
             selector: row => row.notice_times,
             sortable: true,
@@ -134,7 +150,7 @@ export function Customers() {
     const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const appState = useAppState()
-    const checkFirstRender = useRef(true)
+    const isFirstSearchRender = useRef(true)
     const [filter, setFilter] = useState("all");
     const [filterSexe, setFilterSexe] = useState("all");
     const [startDate, setStartDate] = useState(0);
@@ -242,7 +258,7 @@ export function Customers() {
         if (action === "add") {
             setShowModal(true);
         } else if (action === "pre_expire") {
-            if (window.confirm("Send notifications to all customers nearing expiration?")) {
+            if (window.confirm(appState.langData["Send notifications to all customers nearing expiration?"] || "Send notifications to all customers nearing expiration?")) {
                 setLoading(true);
                 api.post("/customers/notify/pre-expire", null, { params: currentParams })
                     .then(() => {
@@ -255,7 +271,7 @@ export function Customers() {
                     });
             }
         } else if (action === "expired") {
-            if (window.confirm("Send notifications to all customers with expired plans?")) {
+            if (window.confirm(appState.langData["Send notifications to all customers with expired plans?"] || "Send notifications to all customers with expired plans?")) {
                 setLoading(true);
                 api({
                     method: "post",
@@ -272,10 +288,6 @@ export function Customers() {
             }
         }
         e.target.value = "all";
-    }
-
-    const handleAddNew = () => {
-        setShowModal(true)
     }
 
     const handleCustomerAdded = (newCustomer) => {
@@ -312,17 +324,14 @@ export function Customers() {
     };
     useEffect(() => {
         fetchCustomers();
-    }, []);
-    useEffect(() => {
-        if (checkFirstRender.current) {
-            checkFirstRender.current = false;
-            return;
-        }
-        fetchCustomers();
-
     }, [filter, filterSexe, startDate, endDate])
 
     useEffect(() => {
+        if (isFirstSearchRender.current) {
+            isFirstSearchRender.current = false;
+            return;
+        }
+
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }

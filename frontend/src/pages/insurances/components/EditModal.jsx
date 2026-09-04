@@ -60,7 +60,7 @@ export function EditModal({ handleClose, onInsuranceEdited, editedInsuranceId })
                                 <Lang>Edit Insurance</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         {loading ? <div className="text-center p-3"><Spinner /></div> : (

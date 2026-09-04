@@ -146,7 +146,7 @@ class InsuranceController extends Controller
                 "start_at" => $validatedFields['start_at'],
                 "expire_at" => $startAt->copy()->addMonths($insurancePeriode),
                 "price" => $insurancePrice,
-                "periode" => $insurancePeriode,
+                "peride" => $insurancePeriode,
                 "notice_times" => 0,
                 "user_id" => $user->id,
                 "customer_id" => $validatedFields['customer_id'],
@@ -183,7 +183,7 @@ class InsuranceController extends Controller
                 "start_at" => $validatedFields['start_at'],
                 "price" => $insurancePrice,
                 "expire_at" => $startAt->copy()->addMonths($insurancePeriode),
-                "periode" => $insurancePeriode,
+                "peride" => $insurancePeriode,
             ]);
 
             return response([

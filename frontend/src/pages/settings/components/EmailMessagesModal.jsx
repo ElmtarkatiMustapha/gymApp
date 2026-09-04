@@ -42,28 +42,28 @@ export function EmailMessagesModal({ data, onClose, onUpdate }) {
                                 <Lang>Edit Email Messages</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={onClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={onClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body p-4">
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Pre-expiration message</Lang> (*) :</label>
                             <textarea className="form-control" name="preExpiration" value={formData.preExpiration} onChange={handleChange} rows="4" required></textarea>
-                            <div className="form-text small opacity-75"><code className="fw-bold">{`{name}`}</code>, <code className="fw-bold">{`{plan_name}`}</code>, <code className="fw-bold">{`{expiry_date}`}</code> as placeholders.</div>
+                            <div className="form-text small opacity-75"><code className="fw-bold">{`{name}`}</code>, <code className="fw-bold">{`{plan_name}`}</code>, <code className="fw-bold">{`{expiry_date}`}</code> <Lang>as placeholders</Lang>.</div>
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Expiration message</Lang> (*) :</label>
                             <textarea className="form-control" name="expiration" value={formData.expiration} onChange={handleChange} rows="4" required></textarea>
-                            <div className="form-text small opacity-75"><code className="fw-bold">{`{name}`}</code>, <code className="fw-bold">{`{plan_name}`}</code>, <code className="fw-bold">{`{expiry_date}`}</code> as placeholders.</div>
+                            <div className="form-text small opacity-75"><code className="fw-bold">{`{name}`}</code>, <code className="fw-bold">{`{plan_name}`}</code>, <code className="fw-bold">{`{expiry_date}`}</code> <Lang>as placeholders</Lang>.</div>
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Welcome message</Lang> (*) :</label>
                             <textarea className="form-control" name="welcome" value={formData.welcome} onChange={handleChange} rows="4" required></textarea>
-                            <div className="form-text small opacity-75"><code className="fw-bold">{`{name}`}</code>, <code className="fw-bold">{`{plan_name}`}</code>, <code className="fw-bold">{`{expiry_date}`}</code> as placeholders.</div>
+                            <div className="form-text small opacity-75"><code className="fw-bold">{`{name}`}</code>, <code className="fw-bold">{`{plan_name}`}</code>, <code className="fw-bold">{`{expiry_date}`}</code> <Lang>as placeholders</Lang>.</div>
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Success Payment message</Lang> (*) :</label>
                             <textarea className="form-control" name="successPayment" value={formData.successPayment} onChange={handleChange} rows="4" required></textarea>
-                            <div className="form-text small opacity-75"><code className="fw-bold">{`{name}`}</code>, <code className="fw-bold">{`{plan_name}`}</code>, <code className="fw-bold">{`{expiry_date}`}</code> as placeholders.</div>
+                            <div className="form-text small opacity-75"><code className="fw-bold">{`{name}`}</code>, <code className="fw-bold">{`{plan_name}`}</code>, <code className="fw-bold">{`{expiry_date}`}</code> <Lang>as placeholders</Lang>.</div>
                         </div>
                     </div>
                     <div className="modal-footer d-flex justify-content-end">

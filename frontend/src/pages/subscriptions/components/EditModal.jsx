@@ -38,7 +38,7 @@ export function EditModal({ handleClose, onSubscriptionEdited, editedSubscriptio
                     plan_id: data.plan?.id || ""
                 });
                 setLoading(false);
-            } catch (err) {
+            } catch {
                 appAction({ type: "SET_ERROR", payload: "Failed to fetch data" });
                 handleClose();
             }
@@ -74,7 +74,7 @@ export function EditModal({ handleClose, onSubscriptionEdited, editedSubscriptio
                                 <Lang>Edit Subscription</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         {loading ? <div className="text-center p-3"><Spinner /></div> : (
@@ -89,7 +89,7 @@ export function EditModal({ handleClose, onSubscriptionEdited, editedSubscriptio
                                     >
                                         <option value="" disabled>{t("Select a plan")}</option>
                                         {plans.map(p => (
-                                            <option key={p.id} value={p.id}>{p.description} ({p.duration} mois - {p.price} DH)</option>
+                                            <option key={p.id} value={p.id}>{p.description} ({p.duration} {t("Months")} - {p.price} DH)</option>
                                         ))}
                                     </select>
                                 </div>

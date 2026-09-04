@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAppAction } from "../../../context/context";
+import { useAppAction, useAppState } from "../../../context/context";
 import api from "../../../api/api";
 import { Lang } from "../../../assets/js/lang";
 import { ButtonBlue } from "../../../components/ButtonBlue";
@@ -8,6 +8,8 @@ export function InvoiceModal({ data, onClose, onUpdate }) {
     const [formData, setFormData] = useState({ ...data });
     const [loading, setLoading] = useState(false);
     const appAction = useAppAction();
+    const appState = useAppState();
+    const t = (key) => appState.langData[key] || key;
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -42,16 +44,16 @@ export function InvoiceModal({ data, onClose, onUpdate }) {
                                 <Lang>Edit Invoice Settings</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={onClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={onClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body p-4">
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Header</Lang> (*) :</label>
-                            <textarea className="form-control" name="header" value={formData.header} onChange={handleChange} rows="4" required placeholder="Business address, RC, ICE..."></textarea>
+                            <textarea className="form-control" name="header" value={formData.header} onChange={handleChange} rows="4" required placeholder={t("Business address, RC, ICE...")}></textarea>
                         </div>
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Footer</Lang> (*) :</label>
-                            <textarea className="form-control" name="footer" value={formData.footer} onChange={handleChange} rows="4" required placeholder="Terms and conditions, bank account..."></textarea>
+                            <textarea className="form-control" name="footer" value={formData.footer} onChange={handleChange} rows="4" required placeholder={t("Terms and conditions, bank account...")}></textarea>
                         </div>
                     </div>
                     <div className="modal-footer d-flex justify-content-end">

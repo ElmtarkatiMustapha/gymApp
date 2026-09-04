@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import api from "../../../api/api";
 import { useAppAction, useAppState } from "../../../context/context";
 import { Lang } from "../../../assets/js/lang";
@@ -13,6 +13,7 @@ import { FaEdit, FaPlus, FaPrint } from "react-icons/fa";
 import { EditModal as CustomerEditModal } from "../components/EditModal";
 import { AddModal as SubscriptionAddModal } from "../../subscriptions/components/AddModal";
 import { EditModal as SubscriptionEditModal } from "../../subscriptions/components/EditModal";
+import { PaymentModal } from "../../subscriptions/components/PaymentModal";
 import { AddModal as InsuranceAddModal } from "../../insurances/components/AddModal";
 import { EditModal as InsuranceEditModal } from "../../insurances/components/EditModal";
 import "../../../assets/css/pages.css";
@@ -21,7 +22,6 @@ import { printCustomerFile } from "../../../utils/printCustomerFile";
 
 export function SingleCustomer() {
     const { id } = useParams();
-    const navigate = useNavigate();
     const appState = useAppState();
     const appAction = useAppAction();
 
@@ -44,9 +44,11 @@ export function SingleCustomer() {
     const [showCustomerEditModal, setShowCustomerEditModal] = useState(false);
     const [showSubAddModal, setShowSubAddModal] = useState(false);
     const [showSubEditModal, setShowSubEditModal] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showInsAddModal, setShowInsAddModal] = useState(false);
     const [showInsEditModal, setShowInsEditModal] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
+    const [paymentSubscription, setPaymentSubscription] = useState(null);
 
     const handlePrintCustomerFile = () => {
         printCustomerFile({
@@ -71,15 +73,22 @@ export function SingleCustomer() {
     };
 
     const subscriptionColumns = [
-        { name: 'ID', selector: row => row.id, sortable: true, width: '70px' },
-        { name: 'Plan', selector: row => row.plan?.description || 'N/A' },
-        { name: 'Duration', selector: row => (row.duration || 0) + " mois" },
-        { name: 'Total (DH)', selector: row => row.price },
-        { name: 'Start at', selector: row => row.start_at, cell: row => safeFormatDate(row.start_at), sortable: true },
-        { name: 'Expire at', selector: row => row.expire_at, cell: row => safeFormatDate(row.expire_at), sortable: true },
-        { name: 'Payed at', selector: row => row.created_at, cell: row => safeFormatDate(row.created_at, 'N/A'), sortable: true },
+        { name: <Lang>ID</Lang>, selector: row => row.id, sortable: true, width: '70px' },
+        { name: <Lang>Plan</Lang>, selector: row => row.plan?.description || 'N/A' },
+        { name: <Lang>Duration</Lang>, selector: row => row.duration || 0, cell: row => <>{row.duration || 0} <Lang>Months</Lang></> },
+        { name: <><Lang>Total</Lang> (DH)</>, selector: row => row.price },
+        { name: <><Lang>Paid</Lang> (DH)</>, selector: row => row.paid_amount, cell: row => Number(row.paid_amount || 0).toFixed(2) },
+        { name: <><Lang>Remaining</Lang> (DH)</>, selector: row => row.remaining_amount, cell: row => Number(row.remaining_amount || 0).toFixed(2) },
         {
-            name: 'State',
+            name: <Lang>Payment status</Lang>,
+            selector: row => row.payment_status,
+            cell: row => <span className={Number(row.remaining_amount) > 0 ? 'text-warning' : 'text-success'}><Lang>{row.payment_status}</Lang></span>
+        },
+        { name: <Lang>Start at</Lang>, selector: row => row.start_at, cell: row => safeFormatDate(row.start_at), sortable: true },
+        { name: <Lang>Expire at</Lang>, selector: row => row.expire_at, cell: row => safeFormatDate(row.expire_at), sortable: true },
+        { name: <Lang>Payed at</Lang>, selector: row => row.payments?.at(-1)?.paid_at, cell: row => safeFormatDate(row.payments?.at(-1)?.paid_at, 'N/A'), sortable: true },
+        {
+            name: <Lang>State</Lang>,
             selector: row => getSubscriptionState(row).label,
             cell: row => {
                 const st = getSubscriptionState(row);
@@ -89,16 +98,26 @@ export function SingleCustomer() {
             width: '100px'
         },
         {
-            name: 'Action',
+            name: <Lang>Action</Lang>,
             cell: row => (
-                <button className="btn btn-sm text-primary" onClick={() => {
-                    setSelectedId(row.id);
-                    setShowSubEditModal(true);
-                }}>
-                    <FaEdit />
-                </button>
+                <div className="d-flex gap-1">
+                    <button className="btn btn-sm text-primary" onClick={() => {
+                        setSelectedId(row.id);
+                        setShowSubEditModal(true);
+                    }} title={appState.langData.Edit || 'Edit'}>
+                        <FaEdit />
+                    </button>
+                    {Number(row.remaining_amount) > 0 && (
+                        <button className="btn btn-sm btn-outline-primary" onClick={() => {
+                            setPaymentSubscription({ ...row, customer: customerData });
+                            setShowPaymentModal(true);
+                        }}>
+                            <Lang>Pay rest</Lang>
+                        </button>
+                    )}
+                </div>
             ),
-            width: '80px'
+            width: '150px'
         }
     ];
 
@@ -111,14 +130,14 @@ export function SingleCustomer() {
     };
 
     const insuranceColumns = [
-        { name: 'ID', selector: row => row.id, sortable: true, width: '70px' },
-        { name: 'Price (DH)', selector: row => row.price },
-        { name: 'Duration', selector: row => (row.periode || 12) + " mois" },
-        { name: 'Start at', selector: row => row.start_at, cell: row => safeFormatDate(row.start_at), sortable: true },
-        { name: 'Expire at', selector: row => row.expire_at, cell: row => safeFormatDate(row.expire_at), sortable: true },
-        { name: 'Payed at', selector: row => row.created_at, cell: row => safeFormatDate(row.created_at, 'N/A'), sortable: true },
+        { name: <Lang>ID</Lang>, selector: row => row.id, sortable: true, width: '70px' },
+        { name: <><Lang>Price</Lang> (DH)</>, selector: row => row.price },
+        { name: <Lang>Duration</Lang>, selector: row => row.peride || 12, cell: row => <>{row.peride || 12} <Lang>Months</Lang></> },
+        { name: <Lang>Start at</Lang>, selector: row => row.start_at, cell: row => safeFormatDate(row.start_at), sortable: true },
+        { name: <Lang>Expire at</Lang>, selector: row => row.expire_at, cell: row => safeFormatDate(row.expire_at), sortable: true },
+        { name: <Lang>Payed at</Lang>, selector: row => row.created_at, cell: row => safeFormatDate(row.created_at, 'N/A'), sortable: true },
         {
-            name: 'State',
+            name: <Lang>State</Lang>,
             selector: row => getInsuranceState(row).label,
             cell: row => {
                 const st = getInsuranceState(row);
@@ -128,7 +147,7 @@ export function SingleCustomer() {
             width: '100px'
         },
         {
-            name: 'Action',
+            name: <Lang>Action</Lang>,
             cell: row => (
                 <button className="btn btn-sm text-primary" onClick={() => {
                     setSelectedId(row.id);
@@ -185,7 +204,7 @@ export function SingleCustomer() {
     };
 
     if (loading && !customerData) return <div className="text-center p-5"><CustomLoader /></div>;
-    if (!customerData) return <div className="text-center p-5">Customer not found</div>;
+    if (!customerData) return <div className="text-center p-5"><Lang>Customer not found</Lang></div>;
 
     return (
         <>
@@ -218,7 +237,7 @@ export function SingleCustomer() {
                                 </div>
                                 <div className="col-md-6 mb-3">
                                     <span className="fw-bold text-primary-c me-2"><Lang>Sexe</Lang>:</span>
-                                    <span className="text-muted">{customerData.sexe}</span>
+                                    <span className="text-muted"><Lang>{customerData.sexe}</Lang></span>
                                 </div>
                                 <div className="col-md-6 mb-3">
                                     <span className="fw-bold text-primary-c me-2"><Lang>Birthday</Lang>:</span>
@@ -231,7 +250,7 @@ export function SingleCustomer() {
                                 <div className="col-md-6 mb-3">
                                     <span className="fw-bold text-primary-c me-2"><Lang>insurance</Lang>:</span>
                                     <span className={customerData.insurance_status === 'Active' ? "text-success fw-bold" : (customerData.insurance_status === 'Upcoming' ? "text-danger fw-bold" : "text-danger fw-bold")}>
-                                        {customerData.insurance_status}
+                                        <Lang>{customerData.insurance_status}</Lang>
                                     </span>
                                 </div>
                                 <div className="col-md-6 mb-3">
@@ -249,7 +268,7 @@ export function SingleCustomer() {
                                 <div className="col-md-6 mb-3">
                                     <span className="fw-bold text-primary-c me-2"><Lang>State</Lang>:</span>
                                     <span className={customerData.state === 'Active' ? "text-success fw-bold" : "text-danger fw-bold"}>
-                                        {customerData.state}
+                                        <Lang>{customerData.state}</Lang>
                                     </span>
                                 </div>
                             </div>
@@ -278,6 +297,22 @@ export function SingleCustomer() {
                                     <span className="fw-bold me-2"><Lang>Price</Lang>:</span>
                                     <span>{activePlan?.price || 'N/A'}</span>
                                 </div>
+                                <div className="mb-2">
+                                    <span className="fw-bold me-2"><Lang>Paid</Lang>:</span>
+                                    <span>{Number(activePlan?.paid_amount || 0).toFixed(2)} DH</span>
+                                </div>
+                                <div className="mb-2">
+                                    <span className="fw-bold me-2"><Lang>Remaining</Lang>:</span>
+                                    <span>{Number(activePlan?.remaining_amount || 0).toFixed(2)} DH</span>
+                                </div>
+                                {Number(activePlan?.remaining_amount) > 0 && (
+                                    <button className="btn btn-sm btn-light mt-2" onClick={() => {
+                                        setPaymentSubscription({ ...activePlan, customer: customerData });
+                                        setShowPaymentModal(true);
+                                    }}>
+                                        <Lang>Pay rest</Lang>
+                                    </button>
+                                )}
                                 <div className="mb-2">
                                     <span className="fw-bold me-2"><Lang>Start At</Lang>:</span>
                                     <span>{safeFormatDate(activePlan?.start_at, 'N/A')}</span>
@@ -335,6 +370,13 @@ export function SingleCustomer() {
                     handleClose={() => setShowSubEditModal(false)}
                     onSubscriptionEdited={fetchDetails}
                     editedSubscriptionId={selectedId}
+                />
+            )}
+            {showPaymentModal && (
+                <PaymentModal
+                    handleClose={() => setShowPaymentModal(false)}
+                    onPaymentAdded={fetchDetails}
+                    subscription={paymentSubscription}
                 />
             )}
             {showInsAddModal && (

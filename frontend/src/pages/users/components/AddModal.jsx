@@ -4,11 +4,13 @@ import { ButtonBlue } from "../../../components/ButtonBlue";
 import { Spinner } from "../../../components/Spinner";
 import api from "../../../api/api";
 import { UploadImage } from "../../../components/UploadImage";
-import { useAppAction } from "../../../context/context";
+import { useAppAction, useAppState } from "../../../context/context";
 // import { toast } from "react-hot-toast";
 export function AddModal({ handleClose, onUserAdded }) {
     const [loading, setLoading] = useState(false);
     const appAction = useAppAction()
+    const appState = useAppState();
+    const t = (key) => appState.langData[key] || key;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,7 +27,7 @@ export function AddModal({ handleClose, onUserAdded }) {
                 }
                 handleClose();
             }
-        } catch (error) {
+        } catch {
             // console.error("Failed to add plan:", error.message);
             // if (window.toast) window.toast.error("Failed to add plan. Please check the fields.");
             // else alert("Failed to add plan");
@@ -45,43 +47,43 @@ export function AddModal({ handleClose, onUserAdded }) {
                                 <Lang>Add User</Lang> :
                             </div>
                         </div>
-                        <button type="button" onClick={handleClose} className="btn-close" aria-label="Close"></button>
+                        <button type="button" onClick={handleClose} className="btn-close"><span className="visually-hidden"><Lang>Close</Lang></span></button>
                     </div>
                     <div className="modal-body">
                         <div className="mb-3">
                             <label className="form-label h6 fw-bold"><Lang>Name</Lang> (*) : {loading && <Spinner />}</label>
-                            <input type="text" name="name" required disabled={loading} className="form-control" placeholder="Ex: mustapha el mtarkati" />
+                            <input type="text" name="name" required disabled={loading} className="form-control" placeholder={t("Ex: mustapha el mtarkati")} />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h5"><Lang>Email</Lang> (*) : {loading && <Spinner />}</label>
-                            <input type="email" required disabled={loading} name="email" className="form-control" placeholder={Lang({ children: "Tap email" })} id="" />
+                            <input type="email" required disabled={loading} name="email" className="form-control" placeholder={t("Tap email")} id="" />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h5"><Lang>Cin</Lang> : {loading && <Spinner />}</label>
-                            <input type="text" disabled={loading} name="cin" className="form-control" placeholder={Lang({ children: "Tap cin" })} id="" />
+                            <input type="text" disabled={loading} name="cin" className="form-control" placeholder={t("Tap cin")} id="" />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h5"><Lang>Phone</Lang> : {loading && <Spinner />}</label>
-                            <input type="text" disabled={loading} name="phone" className="form-control" placeholder={Lang({ children: "Tap Phone" })} id="" />
+                            <input type="text" disabled={loading} name="phone" className="form-control" placeholder={t("Tap Phone")} id="" />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h5"><Lang>Username</Lang> (*) : {loading && <Spinner />}</label>
-                            <input type="text" required disabled={loading} name="username" className="form-control" placeholder={Lang({ children: "Tap username" })} id="" />
+                            <input type="text" required disabled={loading} name="username" className="form-control" placeholder={t("Tap username")} id="" />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h5"><Lang>Password</Lang> (*) : {loading && <Spinner />}</label>
-                            <input type="password" required disabled={loading} name="password" className="form-control" placeholder={Lang({ children: "Tap password" })} id="" />
+                            <input type="password" required disabled={loading} name="password" className="form-control" placeholder={t("Tap password")} id="" />
                         </div>
                         <div className="mb-3">
                             <label className="form-label h5"><Lang>Sexe</Lang> (*) : {loading && <Spinner />}</label>
                             <div>
                                 <span className="p-1">
                                     <input type="radio" name="sexe" value="male" className="form-check-input" id="male" defaultChecked />
-                                    <label className="form-check-label ps-1" htmlFor="male">Male</label>
+                                    <label className="form-check-label ps-1" htmlFor="male"><Lang>Male</Lang></label>
                                 </span>
                                 <span className="p-1">
                                     <input type="radio" name="sexe" value="female" className="form-check-input" id="female" />
-                                    <label className="form-check-label ps-1" htmlFor="female">Female</label>
+                                    <label className="form-check-label ps-1" htmlFor="female"><Lang>Female</Lang></label>
                                 </span>
                             </div>
                         </div>

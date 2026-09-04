@@ -7,6 +7,7 @@ import { PrivateRoute } from '../components/PrivateRoute';
 import { LoggedRoute } from './logged.route';
 import { LoginRoute } from './login/login.route';
 import InstallPage from './install';
+import { Lang } from '../assets/js/lang';
 
 
 export function MainRoute() {
@@ -33,7 +34,9 @@ export function MainRoute() {
                     dispatch({ type: "SET_DEVICE", payload: false })
                 }
                 //get lang data
-                const langData = await fetch(`/langs/${state.currentLang}`)
+                const langData = await fetch(`/langs/${state.currentLang}?v=${Date.now()}`, {
+                    cache: "no-store",
+                })
                     .then((res) => {
                         return res.json();
                     })
@@ -98,7 +101,7 @@ export function MainRoute() {
                 <Routes>
                     {/* login routes */}
                     <Route path="/login/*" element={<LoginRoute />} />
-                    <Route path="/notFound" element={<h1>Not Found 404</h1>} />
+                    <Route path="/notFound" element={<h1><Lang>Not Found 404</Lang></h1>} />
                     {/* if the user logged in */}
                     <Route path="/*" element={<PrivateRoute component={<LoggedRoute />} />} />
                 </Routes>
